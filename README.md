@@ -116,7 +116,7 @@ Some additional notes for developers working on this project:
 - S3 is used to store profile images and listing photos.
 - Flask-Login is used for authentication. See `auth.py`.
 - Flask-WTForms is used for forms and validation. See `forms.py`.
-- The app configuration is set via the config.py file.
+- The app configuration is set via the init.py file.
 
 ## License
 
