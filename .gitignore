@@ -3,6 +3,5 @@ __pycache__/
 app/__pycache__/
 env
 .env
-requirements.txt
 Procfile
 

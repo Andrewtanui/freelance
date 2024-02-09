@@ -31,7 +31,3 @@ def home():
     If the email or phone number already exists. Flash error message "Email Id / Phone Number Already Exists" will appear. - If all fields are filled correctly it will show a success message "Your account has been created successfully".
     
   """
-@app.route('/signup', methods=['GET','POST'])
-def signup():
-  return render_template('signup.html')
-
