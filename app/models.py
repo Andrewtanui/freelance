@@ -14,18 +14,16 @@ class Users(UserMixin, db.Model):
     """Users model for storing user data"""
     __tablename__ = 'users'
     id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    first_name = db.Column(db.String(64), nullable=False)
-    last_name = db.Column(db.String(64), nullable=False)
+    firstname = db.Column(db.String(64), nullable=False)
+    lastname = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(128))
     email = db.Column(db.String(120), unique=True)
     role = db.Column(db.String(10), nullable=False)
     phonenumber = db.Column(db.String(15), unique=False, nullable=True)
 
-    def __init__(self, username, first_name, last_name, password, email, role, phonenumber):
-        self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
+    def __init__(self, firstname, lastname, password, email, role, phonenumber):
+        self.firstname = firstname
+        self.lastname = lastname
         self.password = password
         self.email = email
         self.role = role
@@ -33,7 +31,7 @@ class Users(UserMixin, db.Model):
 
     def get_full_name(self):
         """Method to fetch the full name"""
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.firstname} {self.lastname}"
 
 
 class Seller(db.Model):
@@ -43,7 +41,6 @@ class Seller(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), unique=True, nullable=False)
     bio = db.Column(db.Text)
     profile_picture = db.Column(db.String(255),nullable=True)
-    phonenumber = db.Column(db.String(15), unique=False, nullable=True) 
     address = db.Column(db.String(64), unique=False, nullable=False)
     skill = db.Column(db.String(64), unique=False, nullable=False)
     city = db.Column(db.String(64), unique=False, nullable=False)
@@ -51,11 +48,10 @@ class Seller(db.Model):
     
     user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
 
-    def __init__(self, user_id, address, skill, city, country, phonenumber=None, bio=None, profile_picture=None):
+    def __init__(self, user_id, address, skill, city, country, bio=None, profile_picture=None):
         self.user_id = user_id
         self.bio = bio
         self.profile_picture = profile_picture
-        self.phonenumber = phonenumber
         self.address = address
         self.skill = skill
         self.city = city
