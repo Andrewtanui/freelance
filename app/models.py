@@ -40,15 +40,21 @@ class Seller(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), unique=True, nullable=False)
     bio = db.Column(db.Text)
-    profile_picture = db.Column(db.String(255),nullable=True)
+    profile_picture = db.Column(db.String(255), nullable=True)
     address = db.Column(db.String(64), unique=False, nullable=False)
     skill = db.Column(db.String(64), unique=False, nullable=False)
     city = db.Column(db.String(64), unique=False, nullable=False)
     country = db.Column(db.String(64), unique=False, nullable=False)
     
+    hourly_rate = db.Column(db.Float, nullable=True)
+    availability = db.Column(db.String(50), nullable=True)
+    is_available = db.Column(db.Boolean, default=True)
+    languages = db.Column(db.String(255), nullable=True)
+    
     user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
 
-    def __init__(self, user_id, address, skill, city, country, bio=None, profile_picture=None):
+    def __init__(self, user_id, address, skill, city, country, bio=None, profile_picture=None,
+                 hourly_rate=None, availability=None, is_available=True, languages=None):
         self.user_id = user_id
         self.bio = bio
         self.profile_picture = profile_picture
@@ -56,3 +62,7 @@ class Seller(db.Model):
         self.skill = skill
         self.city = city
         self.country = country
+        self.hourly_rate = hourly_rate
+        self.availability = availability
+        self.is_available = is_available
+        self.languages = languages
