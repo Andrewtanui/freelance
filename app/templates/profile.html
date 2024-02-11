@@ -2,23 +2,51 @@
 
 {% block dashboardbody %}
 
-<div class="mx-auto max-w-screen-xl w-full px-2 py-10">
-    <div class="flex flex-col border-b py-4 sm:flex-row sm:items-start">
+<div class="mx-auto max-w-screen-xl w-full px-2 py-10 overflow-hidden overflow-y-auto max-h-full">
+  <form action="{{url_for('profile')}}" method="post" enctype="multipart/form-data">
+    <div class="flex flex-col border-b py-4 sm:flex-row sm:items-start overflow-y-auto max-h-full">
       <div class="shrink-0 mr-auto sm:py-3">
         <p class="font-medium">Account Details</p>
         <p class="text-sm text-gray-600">Edit your account details</p>
       </div>
       <button class="mr-2 hidden rounded-lg border-2 px-4 py-2 font-medium text-gray-500 sm:inline focus:outline-none focus:ring hover:bg-gray-200">Cancel</button>
-      <button class="hidden rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white sm:inline focus:outline-none focus:ring hover:bg-blue-700">Save</button>
+      <button type="submit" class="hidden rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white sm:inline focus:outline-none focus:ring hover:bg-blue-700">Save</button>
     </div>
     <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
       <p class="shrink-0 w-32 font-medium">Name</p>
-      <input placeholder="First Name" class="mb-2 w-full rounded-md border px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1" value="{{current_user.firstname}}"/>
+      <input placeholder="First Name" class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1" value="{{current_user.firstname}}"/>
       <input placeholder="Last Name" class="w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 focus:ring-1" value="{{current_user.lastname}}"/>
     </div>
     <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-      <p class="shrink-0 w-32 font-medium">Email</p>
-      <input placeholder="your.email@domain.com" class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-blue-600 focus:ring-1" value="{{current_user.email}}"/>
+      <p class="shrink-0 w-32 font-medium">Address & Skill</p>
+                <input type="text" id="address" placeholder="Address" name="address" {% if profile %} value="{{profile.address }}" {% endif %} class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+                <!-- {% if profile %} value="{{profile.address }}" {% endif %} -->
+                <!-- Skill -->
+                <input type="text" id="skill" name="skill" placeholder="Skill" {% if profile %} value="{{profile.skill }}" {% endif %} class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+                <!-- {% if profile %} value="{{profile.skill }}" {% endif %} -->
+    </div>
+    <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
+      <p class="shrink-0 w-32 font-medium">City & Country</p>
+                <input type="text" id="city" placeholder="city" name="city" {% if profile %} value="{{profile.city }}" {% endif %} class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+                <!-- {% if profile %} value="{{profile.city }}" {% endif %} -->
+                <!-- Skill -->
+                <input type="text" id="skill" name="country" placeholder="country" {% if profile %} value="{{profile.country }}" {% endif %} class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+                <!-- {% if profile %} value="{{profile.country }}" {% endif %} -->
+    </div>
+    <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
+      <p class="shrink-0 w-32 font-medium">Rate & Availability</p>
+                <input type="text" id="city" placeholder="Hourly rate" {% if profile %} value="{{profile.hourly_rate}}" {% endif %} name="hourly_rate" class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+                <!-- {% if profile %} value="{{profile.hourly_rate}}" {% endif %} -->
+                <!-- Skill -->
+                <input type="text" id="city" name="availability" {% if profile %} value="{{profile.availability }}" {% endif %} placeholder="Availability" class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+
+                <!-- {% if profile %} value="{{profile.availability }}" {% endif %} -->
+    </div>
+    <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
+      <p class="shrink-0 w-32 font-medium">Email & Language</p>
+      <input placeholder="your.email@domain.com" class="w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 focus:ring-1" value="{{current_user.email}}"/>
+      <input type="text" id="skill" name="languages" placeholder="Language" {% if profile %} value="{{profile.languages }}" {% endif %} class="mb-2 w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1">
+      <!-- {% if profile %} value="{{profile.languages }}" {% endif %} -->
     </div>
     <div class="flex flex-col gap-4 py-4  lg:flex-row">
       <div class="shrink-0 w-32  sm:py-4">
@@ -26,15 +54,28 @@
         <p class="text-sm text-gray-600">Change your avatar</p>
       </div>
       <div class="flex h-56 w-full flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-gray-300 p-5 text-center">
+        {% if not profile.profile_picture %}
         <img src="{{url_for('static', filename='uploads/default.png')}}" class="h-16 w-16 rounded-full" />
         <p class="text-sm text-gray-600">Drop your desired image file here to start the upload</p>
-        <input type="file" class="max-w-full rounded-lg px-2 font-medium text-blue-600 outline-none ring-blue-600 focus:ring-1" />
+        <input type="file" name="profile_picture" class="max-w-full rounded-lg px-2 font-medium text-blue-600 outline-none ring-blue-600 focus:ring-1" />
+        {% endif %}
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 py-4  lg:flex-row">
+      <div class="shrink-0 w-32  sm:py-4">
+        <p class="mb-auto font-medium">Cover letter</p>
+        <p class="text-sm text-gray-600">Write a beautiful cover letter to boost your presence in the marketplace</p>
+      </div>
+      <div class="flex flex-col items-center justify-center gap-4 rounded-xl border-t border-gray-300 p-5 text-center">
+        <textarea id="bio" name="bio" rows="3" class="rounded-lg px-2 font-medium  bg-gray-700 outline-none ring-blue-600 focus:ring-1">{% if profile %} {{profile.bio }} {% endif %}</textarea>
+        <!-- {% if profile %} {{profile.bio }} {% endif %} -->
       </div>
     </div>
     <div class="flex justify-end py-4 sm:hidden">
       <button class="mr-2 rounded-lg border-2 px-4 py-2 font-medium text-gray-500 focus:outline-none focus:ring hover:bg-gray-200">Cancel</button>
-      <button class="rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white focus:outline-none focus:ring hover:bg-blue-700">Save</button>
+      <button type="submit" class="rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white focus:outline-none focus:ring hover:bg-blue-700">Save</button>
     </div>
+    </form>
   </div>
   
 {% endblock dashboardbody %}

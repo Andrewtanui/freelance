@@ -12,6 +12,12 @@
     {% endif %}
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <!-- Include Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+
+    <!-- Include SocketIO script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
 
     {% block header %}{% endblock header %}
 </head>
@@ -131,6 +137,16 @@
           <!-- Component End  -->
   
   </div>
+<!-- Initialize SocketIO connection -->
+<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
 
+    // Handle incoming notifications
+    socket.on('profile_view_notification', function(data) {
+        // Display the notification using Alpine.js
+        Alpine.store('notificationMessage', 'Your profile was viewed by customer ' + data.customer_id);
+        Alpine.store('showNotification', true);
+    });
+</script>
 </body>
 </html>  

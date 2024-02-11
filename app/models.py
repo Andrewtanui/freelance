@@ -2,6 +2,8 @@ from app import app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 import uuid
+import datetime
+from flask_migrate import Migrate
 
 # Set up the application context
 app.app_context().push()
@@ -9,11 +11,12 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 class Users(UserMixin, db.Model):
     """Users model for storing user data"""
     __tablename__ = 'users'
-    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid1()), unique=True, nullable=False)
     firstname = db.Column(db.String(64), nullable=False)
     lastname = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(128))
@@ -21,19 +24,12 @@ class Users(UserMixin, db.Model):
     role = db.Column(db.String(10), nullable=False)
     phonenumber = db.Column(db.String(15), unique=False, nullable=True)
 
-    def __init__(self, firstname, lastname, password, email, role, phonenumber):
-        self.firstname = firstname
-        self.lastname = lastname
-        self.password = password
-        self.email = email
-        self.role = role
-        self.phonenumber = phonenumber
+    # Update this relationship
+    viewed_sellers = db.relationship('ViewedCustomers', back_populates='customer')
 
     def get_full_name(self):
         """Method to fetch the full name"""
         return f"{self.firstname} {self.lastname}"
-
-
 class Seller(db.Model):
     """Profile model for storing user profiles"""
     __tablename__ = 'profiles'
@@ -53,16 +49,15 @@ class Seller(db.Model):
     
     user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
 
-    def __init__(self, user_id, address, skill, city, country, bio=None, profile_picture=None,
-                 hourly_rate=None, availability=None, is_available=True, languages=None):
-        self.user_id = user_id
-        self.bio = bio
-        self.profile_picture = profile_picture
-        self.address = address
-        self.skill = skill
-        self.city = city
-        self.country = country
-        self.hourly_rate = hourly_rate
-        self.availability = availability
-        self.is_available = is_available
-        self.languages = languages
+    # Update this relationship
+    viewed_customers = db.relationship('ViewedCustomers', back_populates='seller')
+
+
+class ViewedCustomers(db.Model):
+    __tablename__ = 'viewed_customers'
+    seller_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), primary_key=True)
+    customer_id = db.Column(db.String(36), db.ForeignKey('users.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+
+    seller = db.relationship('Seller', back_populates='viewed_customers')
+    customer = db.relationship('Users', back_populates='viewed_sellers')
