@@ -1,0 +1,46 @@
+<!-- app/templates/profile/view.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <!-- Include Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seller.user.get_full_name() }}'s Profile</title>
+</head>
+<body>
+    <h1>{{ seller.user.get_full_name() }}'s Profile</h1>
+    
+    <p>Bio: {{ seller.bio }}</p>
+    <p>Address: {{ seller.address }}, {{ seller.city }}, {{ seller.country }}</p>
+    <p>Skill: {{ seller.skill }}</p>
+    <!-- Add more fields as needed -->
+
+    <!-- Display ratings and comments if implemented -->
+    {% if seller.reviews %}
+        <h2>Ratings and Comments</h2>
+        <ul>
+            {% for review in seller.reviews %}
+                <li>Rating: {{ review.rating }} - Comment: {{ review.comment }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+    <!-- Initialize SocketIO connection -->
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Handle incoming notifications
+        socket.on('profile_view_notification', function(data) {
+            // Display the notification using Alpine.js
+            Alpine.store('notificationMessage', 'Your profile was viewed by customer ' + data.customer_id);
+            Alpine.store('showNotification', true);
+        });
+    </script>
+</body>
+</html>
