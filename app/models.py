@@ -13,10 +13,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
+def generate_unique_uuid():
+    while True:
+        new_uuid = str(uuid.uuid4())
+        # Check if the generated UUID already exists in the database
+        existing_user = Users.query.filter_by(id=new_uuid).first()
+        if not existing_user:
+            return new_uuid
+
 class Users(UserMixin, db.Model):
     """Users model for storing user data"""
     __tablename__ = 'users'
-    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid1()), unique=True, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_unique_uuid, unique=True, nullable=False)
     firstname = db.Column(db.String(64), nullable=False)
     lastname = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(128))
@@ -24,12 +33,12 @@ class Users(UserMixin, db.Model):
     role = db.Column(db.String(10), nullable=False)
     phonenumber = db.Column(db.String(15), unique=False, nullable=True)
 
-    # Update this relationship
-    viewed_sellers = db.relationship('ViewedCustomers', back_populates='customer')
 
     def get_full_name(self):
         """Method to fetch the full name"""
         return f"{self.firstname} {self.lastname}"
+    
+    
 class Seller(db.Model):
     """Profile model for storing user profiles"""
     __tablename__ = 'profiles'
@@ -49,15 +58,3 @@ class Seller(db.Model):
     
     user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
 
-    # Update this relationship
-    viewed_customers = db.relationship('ViewedCustomers', back_populates='seller')
-
-
-class ViewedCustomers(db.Model):
-    __tablename__ = 'viewed_customers'
-    seller_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), primary_key=True)
-    customer_id = db.Column(db.String(36), db.ForeignKey('users.id'), primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
-
-    seller = db.relationship('Seller', back_populates='viewed_customers')
-    customer = db.relationship('Users', back_populates='viewed_sellers')

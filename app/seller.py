@@ -1,7 +1,7 @@
 from app import app, socketio
 from flask import render_template, redirect, url_for, request
 from flask_login import current_user, login_required
-from .models import Seller, ViewedCustomers, db
+from .models import Seller, db
 from werkzeug.utils import secure_filename
 import os
 import uuid
@@ -11,9 +11,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/dashboard')
 def dashboard():
-  user = current_user
-  viewed_customers = ViewedCustomers.query.filter_by(seller=user).count()
-  return render_template("dashboard.html", user=user, customers=viewed_customers)
+  return render_template("dashboard.html")
 
 
 @app.route('/orders')
@@ -102,13 +100,5 @@ def view_profile(seller_id):
     
     seller = Seller.query.filter_by(user_id=seller_id).first()
 
-    # Record that the customer has viewed the seller's profile
-    if current_user.role == 'customer':
-        viewed_customer = ViewedCustomers(seller_id=seller.user_id, customer_id=current_user.id)
-        db.session.add(viewed_customer)
-        db.session.commit()
-
-        # Notify the seller about the profile view
-        socketio.emit('profile_view_notification', {'customer_id': current_user.id, 'seller_id': seller.id}, room=seller.user_id)
 
     return render_template('profile_view.html', seller=seller)
