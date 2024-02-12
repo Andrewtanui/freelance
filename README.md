@@ -2,14 +2,14 @@
 
 ## Overview
 
-The Skill Marketplace App is a web application that connects sellers offering various skills and services with customers looking to hire someone to complete a job. This app was built using Flask in Python. 
+The Skill Marketplace App is a web application that connects sellers offering various skills and services with customers looking to hire someone to complete a job. This app was built using Flask in Python.
 
 Sellers can sign up for an account, create a profile showcasing their skills and experience, and list the types of services they offer. Customers can browse seller profiles and listings and connect with sellers to get quotes and hire the right person for the job.
 
 Some key features include:
 
 - Seller accounts and profiles
-- Service listings and search/browse 
+- Service listings and search/browse
 - Customer accounts
 - Request for quotes and seller messaging
 - Booking and payments system
@@ -20,32 +20,38 @@ Some key features include:
 To install and run this Flask application locally:
 
 1. Clone this repo
+
 ```
 git clone https://github.com/Andrewtanui/freelance.git
 ```
 
 2. Navigate into the project directory
+
 ```
 cd freelance
 ```
 
 3. Create a virtual environment and activate it
+
 ```
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 4. Install the requirements
+
 ```
 pip install -r requirements.txt
 ```
 
 5. Set the FLASK_APP environment variable
+
 ```
 export FLASK_APP=app
 ```
 
 6. Run the application
+
 ```
 flask run
 ```
@@ -63,8 +69,9 @@ Sellers first need to create an account. This will allow them to log in and crea
 To create an account, navigate to the signup page and enter your information.
 
 Once registered, sellers can create their profile by adding details like:
+
 - Profile photo
-- Bio 
+- Bio
 - Service area
 - Skills/qualifications
 - Certifications
@@ -77,8 +84,9 @@ Once registered, sellers can create their profile by adding details like:
 In addition to their profile, sellers need to create service listings detailing the types of services they offer. This is how customers will find and connect with them.
 
 Listings should include:
+
 - Service category and subcategories
-- Service name/title 
+- Service name/title
 - Description of service
 - Pricing/rates
 - Photos
