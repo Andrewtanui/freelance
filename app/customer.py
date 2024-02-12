@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, flash, url_for, redirect, request, jsonify
 from flask_login import login_required,current_user
-from .models import Seller, Users
+from .models import Seller, Users, Ratings, db
 from sqlalchemy import or_
   
 @app.route('/marketplace')
@@ -58,3 +58,35 @@ def search_sellers():
       sellers = sellers,
       search_query=search_query
     ) 
+    
+    
+@app.route('/review/<seller_id>', methods=['POST'])
+@login_required
+def review(seller_id):
+    if request.method == 'POST':
+        if current_user.role != 'customer':
+            return jsonify({'error': 'Only customers can submit reviews'}), 403
+
+        # Extract data from the request
+        data = request.json  # Assuming JSON data is sent in the request body
+
+        # Example data extraction
+        rating = data.get('rating')
+        text = data.get('text')
+
+        # Validate the data (e.g., check if all required fields are present)
+
+        # Save the review to the database
+        new_review = Ratings(
+            seller_id=seller_id,
+            customer_id=current_user.id,
+            rating=rating,
+            text=text
+        )
+        db.session.add(new_review)
+        db.session.commit()
+
+        return jsonify({'message': 'Review submitted successfully'}), 200
+    else:
+        return jsonify({'error': 'Only POST requests are allowed'}), 405
+    

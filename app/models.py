@@ -57,4 +57,17 @@ class Seller(db.Model):
     languages = db.Column(db.String(255), nullable=True)
     
     user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
+    ratings = db.relationship('Ratings', backref='seller', lazy=True)
 
+
+class Ratings(db.Model):
+    """Ratings model for storing user ratings"""
+    __tablename__ = 'ratings'
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.Text, nullable=True)
+    customer_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    
+    customer = db.relationship('Users', foreign_keys=[customer_id])
+    seller = db.relationship('Seller', foreign_keys=[seller_id])

@@ -113,44 +113,21 @@
                     </ul>
                 </div>
                 <div class="flex flex-col w-full mt-5 2xl:w-2/3">
-                    <div class="flex-1 bg-white rounded-lg shadow-xl p-8">
-                        <h4 class="text-xl text-gray-900 font-bold">About</h4>
-                        <p class="mt-2 text-gray-700">{{seller.bio}}</p>
+                    <div class="max-w-xl mx-auto mt-16 flex w-full flex-col border rounded-lg bg-white p-8">
+                        <h2 class="title-font mb-1 text-lg font-medium text-gray-900">Feedback</h2>
+                        <p class="mb-5 leading-relaxed text-gray-600">If you had any issues or you liked our product, please share
+                            with us!
+                        </p>
+                        <div class="flex space-x-2">
+                            <label class="text-center"><input type="radio" class="flex items-center justify-center w-6 h-6 bg-gray-100 rounded-lg dark:bg-gray-600" name="rate" value="1">1</label><label class="text-center"><input type="radio" class="flex items-center justify-center w-6 h-6" name="rate" value="2">2</label><label class="text-center"><input type="radio" class="flex items-center justify-center w-6 h-6" name="rate" value="3">3</label><label class="text-center"><input type="radio" class="flex items-center justify-center w-6 h-6" name="rate" value="4">4</label><label class="text-center"><input type="radio" class="flex items-center justify-center w-6 h-6" name="rate" value="5">5</label>
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="text-sm leading-7 text-gray-600">Feedback</label>
+                            <textarea id="message" name="message" class="h-32 w-full resize-none rounded border border-gray-300 bg-white py-1 px-3 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"></textarea>
+                        </div>
+                        <button class="rounded border-0 bg-indigo-500 py-2 px-6 text-lg text-white hover:bg-indigo-600 focus:outline-none">Send</button>
+                        <p class="mt-3 text-xs text-gray-500">Feel free to connect with us on social media platforms.</p>
                     </div>
-                    <div class="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
-                        <h4 class="text-xl text-gray-900 font-bold">Statistics</h4>
-                        
-                        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-                            <div class="md:flex">
-                              <div class="md:flex-shrink-0">
-                                <img class="h-48 w-full object-cover md:w-48" src="{{url_for('static',filename='uploads/'+seller.profile_picture)}}" alt="Review Image">
-                              </div>
-                              <div class="p-8">
-                                <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">Leave a Review</div>
-                                <div class="mt-4">
-                                  <div class="flex items-center mb-4">
-                                    <span class="mr-2">Rating:</span>
-                                    <input type="checkbox" id="rating1" name="rating" value="1" class="appearance-none border-blue-500 rounded-sm checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                                    <label for="rating1" class="mr-2">1</label>
-                                    <input type="checkbox" id="rating2" name="rating" value="2" class="appearance-none border-blue-500 rounded-sm checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                                    <label for="rating2" class="mr-2">2</label>
-                                    <input type="checkbox" id="rating3" name="rating" value="3" class="appearance-none border-blue-500 rounded-sm checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                                    <label for="rating3" class="mr-2">3</label>
-                                    <input type="checkbox" id="rating4" name="rating" value="4" class="appearance-none border-blue-500 rounded-sm checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                                    <label for="rating4" class="mr-2">4</label>
-                                    <input type="checkbox" id="rating5" name="rating" value="5" class="appearance-none border-blue-500 rounded-sm checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
-                                    <label for="rating5" class="mr-2">5</label>
-                                  </div>
-                                  <div>
-                                    <label for="review" class="block text-sm font-medium text-gray-700">Review:</label>
-                                    <textarea id="review" name="review" rows="3" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
-                                  </div>
-                                </div>
-                                <div class="mt-6">
-                                  <button type="button" class="py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Submit Review</button>
-                                </div>
-                              </div>
-                            </div>
                           </div>
                           
                     </div>
@@ -159,6 +136,4 @@
 
 </div>
 </div>
-</div>
-</body>
 </html>
