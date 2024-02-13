@@ -23,7 +23,6 @@
 </head>
 
 <body>
-  {% if not current_user.is_authenticated %}
   <header class="mb-2 px-4 shadow">
     <div class="relative mx-auto flex max-w-screen-lg flex-col py-4 sm:flex-row sm:items-center sm:justify-between">
       <a class="flex items-center text-2xl font-black" href="/">
@@ -39,16 +38,20 @@
       </label>
       <nav aria-label="Header Navigation" class="peer-checked:block hidden pl-2 py-6 sm:block sm:py-0">
         <ul class="flex flex-col gap-y-4 sm:flex-row sm:gap-x-8">
-          <li class=""><a class="text-gray-600 hover:text-blue-600" href="#">Pricing</a></li>
-          <li class=""><a class="text-gray-600 hover:text-blue-600" href="#">Demo</a></li>
-          <li class=""><a class="text-gray-600 hover:text-blue-600" href="#">Support</a></li>
+          {% if current_user.role == 'customer' %}
+          <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('marketplace')}}">Marketplace</a></li>
+          <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('listing')}}">Post a job</a></li>
+          <li class=""><a class="text-gray-600 hover:text-blue-600" href="#">Profile</a></li>
+          {% else %}
+          <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('dashboard')}}">Dashboard</a></li>
+          {% if not current_user.is_authenticated %}
           <li class="mt-2 sm:mt-0"><a class="rounded-xl border-2 border-blue-600 px-6 py-2 font-medium text-blue-600 hover:bg-blue-600 hover:text-white" href="{{url_for('login')}}">Login</a></li>
           <li class="mt-2 sm:mt-0"><a class="rounded-xl border-2 border-blue-600 px-6 py-2 font-medium text-blue-600 hover:bg-blue-600 hover:text-white" href="{{url_for('signup')}}">Sign up</a></li>
+          {% endif %}
         </ul>
       </nav>
     </div>
   </header>
-  {% endif %}
 <!-- Nav bar ends here  -->
 <!-- Flashed messages  -->
 {% with messages = get_flashed_messages(with_categories=true) %}

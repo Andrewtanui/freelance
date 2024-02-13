@@ -7,9 +7,10 @@ import os
 import uuid
 
 UPLOAD_FOLDER = 'app/static/uploads/'
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/dashboard')
+@app.route('/dashboard/talent/')
 def dashboard():
   return render_template("dashboard.html")
 

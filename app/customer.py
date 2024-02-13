@@ -1,9 +1,30 @@
+"""
+What do you think the customer will do, or the routes that the customer will access goes here.
+Some routes are in the listing file but those also have routes talents will use.
+
+This file will hold the following routes:
+/marketplace
+/search
+/review/<seller_id>
+
+
+
+"""
 from app import app
 from flask import render_template, flash, url_for, redirect, request, jsonify
 from flask_login import login_required,current_user
 from .models import Seller, Users, Ratings, db
 from sqlalchemy import or_
-  
+
+"""
+
+The marketplace is where all the talents will be displayed.
+We will use paginate method provided by Flask-sqlalchemy library.
+Paginate function will only send requests that the user only asked for.
+This prevents all the talents to be displayed once in the marketplace causing  server overlaod.
+
+
+"""  
 @app.route('/marketplace')
 @login_required
 def marketplace():
@@ -18,11 +39,21 @@ def marketplace():
     flash('You are not allowed to view the marketplace','error')
     return redirect(url_for('dashboard'))
   
-  
+
+"""
+
+The customer can decide to search for a skill or a specific talent.
+This route will facilitate just that.
+This route will get the q parameter from url (User request from marketplace search bar)
+We will create the logic to allow skill or talent to be returned.
+
+
+"""    
   
 @app.route('/search', methods=['GET'])
 def search_sellers():
     search_query = request.args.get('q')  # Get the search query from the request
+    page = request.args.get('page', 1, type=int)
 
     if not search_query:
         return jsonify({'error': 'No search query provided'}), 400
@@ -32,7 +63,7 @@ def search_sellers():
         or_(Users.firstname.ilike(f'%{search_query}%'),
             Users.lastname.ilike(f'%{search_query}%'),
             Seller.skill.ilike(f'%{search_query}%'))
-    ).paginate()
+    ).paginate(per_page=5, page=page, error_out=False)
 
     if not sellers:
         return jsonify({'message': 'No sellers found matching the search criteria'})

@@ -1,13 +1,38 @@
+"""
+Libraries required:
+
+Flask-login
+Flask
+App model is required.
+
+
+
+This file performs user creations into the database.
+Using the Users model, we handle the authentications funcs and user sessions
+The user remember cookie only lasts for a day.
+Timedelta library will set this remember cookie duration
+
+
+Credits:
+
+"""
 from app import (app)
+
 from flask import render_template, redirect, request, flash, url_for
-from flask_login import (UserMixin,
-                         login_user,
+
+from flask_login import (login_user,
                          LoginManager,
                          login_required,
                          logout_user,
                          current_user)
-from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
+
+
+from flask_bcrypt import (Bcrypt,
+                          generate_password_hash, 
+                          check_password_hash)
+
 from .models import Users, db
+
 from datetime import timedelta
 
 bcrypt = Bcrypt(app)
@@ -68,7 +93,7 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        duration = timedelta(days=2)
+        duration = timedelta(days=1)
 
         user = Users.query.filter_by(email=email).first()
         if not email or not password:
@@ -80,19 +105,24 @@ def login():
                            remember=True,
                            duration=duration)
                 
-                next_page = request.args.get('next')            
+            next_page = request.args.get('next')            
                 # Redirect to the page specified in query string parameter "next" (if exists), otherwise go back home
-                if next_page:
-                    flash(f'{current_user.firstname} You can now access this route!', category='success')
-                    return redirect(next_page)
+            if next_page:
+                flash(f'{current_user.firstname} You can now access this route!', 
+                      category='success')
+                return redirect(next_page)
                   
                 # Users of different roles get redirected here
-                if user.role == 'customer':
-                    flash(f'Welcome back {current_user.firstname}!', category='success')
-                    return redirect(url_for('marketplace'))
-                flash(f'Welcome back {current_user.firstname}! Ready for new tasks today?', category='success')
-                return redirect(url_for('dashboard'))
-            flash('Login failed. Please check your email and password.', category='error')   
+            if user.role == 'customer':
+                flash(f'Welcome back {current_user.firstname}!', 
+                      category='success')
+                return redirect(url_for('marketplace'))
+            
+            flash(f'Welcome back {current_user.firstname}! Ready for new tasks today?',
+                  category='success')
+            return redirect(url_for('dashboard'))
+        
+        flash('Login failed. Please check your email and password.', category='error')   
 
     return render_template('login.html')
 
