@@ -54,7 +54,7 @@ def search_sellers():
     } for seller in sellers]
 
     return render_template(
-      'viewProfile.html',
+      'marketplace.html',
       sellers = sellers,
       search_query=search_query
     ) 
@@ -89,4 +89,3 @@ def review(seller_id):
         return jsonify({'message': 'Review submitted successfully'}), 200
     else:
         return jsonify({'error': 'Only POST requests are allowed'}), 405
-    
