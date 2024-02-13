@@ -71,3 +71,46 @@ class Ratings(db.Model):
     
     customer = db.relationship('Users', foreign_keys=[customer_id])
     seller = db.relationship('Seller', foreign_keys=[seller_id])
+    
+class Listing(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  title = db.Column(db.String(200)) 
+  description = db.Column(db.Text)
+  budget = db.Column(db.Numeric(10,2))
+  deadline = db.Column(db.DateTime)
+  
+  client_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+  client = db.relationship('User', backref='listings')
+  
+class Application(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  cover_letter = db.Column(db.Text)
+  
+  freelancer_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+  freelancer = db.relationship('User', backref='applications')
+
+  listing_id = db.Column(db.Integer, db.ForeignKey('listings.id'))
+  listing = db.relationship('Listing', backref='applications')
+  
+
+class Message(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  body = db.Column(db.Text)
+  sent_at = db.Column(db.DateTime)
+
+  sender_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+  sender = db.relationship('User', foreign_keys=[sender_id])
+
+  recipient_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+  recipient = db.relationship('User', foreign_keys=[recipient_id])        
+  
+  
+  
+class Notification(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  message = db.Column(db.Text)
+  is_read = db.Column(db.Boolean, default=False)
+
+  user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
+  user = db.relationship('User', backref='notifications')  
+  
