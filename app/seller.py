@@ -52,7 +52,6 @@ def profile():
         if profile:
             # Update the existing profile
             profile.bio = bio
-            profile.profile_picture = pic_name
             profile.address = address
             profile.skill = skill
             profile.city = city
@@ -102,3 +101,4 @@ def view_profile(seller_id):
 
 
     return render_template('profile_view.html', seller=seller)
+
