@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block dashboardbody %}
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+    <h2 class="text-2xl font-bold mb-4">Apply for Listing</h2>
+    <p class="text-gray-600 mb-4">{{ listing.title }}</p>
+    <p class="text-gray-600 mb-4">{{ listing.description }}</p>
+    <form method="POST" action="{{ url_for('apply_for_listing', listing_id=listing.id) }}">
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2" for="cover_letter">
+                Cover Letter
+            </label>
+            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="cover_letter" name="cover_letter" rows="5" placeholder="Write your cover letter here..."></textarea>
+        </div>
+        <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+            Submit Application
+        </button>
+    </form>
+</div>
+{% endblock %}

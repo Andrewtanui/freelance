@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block dashboardbody %}
+<!-- <div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10"> -->
+    <h2 class="text-2xl font-bold mb-4">Job Details</h2>
+    <div class="mb-4">
+        <h3 class="text-lg font-bold">Title:</h3>
+        <p class="text-gray-600">{{ job.title }}</p>
+    </div>
+    <div class="mb-4">
+        <h3 class="text-lg font-bold">Description:</h3>
+        <p class="text-gray-600">{{ job.description }}</p>
+    </div>
+    <div class="mb-4">
+        <h3 class="text-lg font-bold">Client:</h3>
+        <p class="text-gray-600">{{ job.client.get_full_name() }}</p>
+    </div>
+
+    {% if current_user.id == job.freelancer_id %}
+    <h2 class="text-2xl font-bold mb-4 mt-8">Upload Deliverable</h2>
+    <form method="POST" action="{{ url_for('view_job', job_id=job.id) }}" enctype="multipart/form-data">
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2" for="deliverable_title">
+                Deliverable Title
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="deliverable_title" name="deliverable_title" type="text" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2" for="deliverable_description">
+                Deliverable Description
+            </label>
+            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="deliverable_description" name="deliverable_description" rows="3" required></textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2" for="deliverable_file">
+                Deliverable File
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="deliverable_file" name="deliverable_file" type="file" required>
+        </div>
+        <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+            Upload Deliverable
+        </button>
+    </form>
+    {% endif %}
+
+    <h2 class="text-2xl font-bold mb-4 mt-8">Deliverables</h2>
+    {% if deliverables %}
+    <ul class="divide-y divide-gray-200">
+        {% for deliverable in deliverables %}
+        <li class="py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold">{{ deliverable.title }}</h3>
+                    <p class="text-gray-600">{{ deliverable.description }}</p>
+                    {% if deliverable.file_path %}
+                    <a href="{{ url_for('download_file', file_path=deliverable.file_path) }}" class="text-indigo-500 hover:text-indigo-700">Download File</a>
+                    {% endif %}
+                </div>
+                {% if current_user.id == job.client_id %}
+                <form method="POST" action="{{ url_for('manage_deliverables', job_id=job.id) }}">
+                    <input type="hidden" name="deliverable_id" value="{{ deliverable.id }}">
+                    {% if deliverable.approved %}
+                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" type="submit" name="action" value="approve" disabled>Approved</button>
+                    {% else %}
+                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" type="submit" name="action" value="approve">Approve</button>
+                    {% endif %}
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" type="submit" name="action" value="request_revision">Request Revision</button>
+                </form>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No deliverables uploaded yet.</p>
+    {% endif %}
+<!-- </div> -->
+{% endblock %}

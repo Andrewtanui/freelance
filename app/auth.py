@@ -8,7 +8,7 @@ App model is required.
 
 
 This file performs user creations into the database.
-Using the Users model, we handle the authentications funcs and user sessions
+Using the User model, we handle the authentications funcs and user sessions
 The user remember cookie only lasts for a day.
 Timedelta library will set this remember cookie duration
 
@@ -31,7 +31,7 @@ from flask_bcrypt import (Bcrypt,
                           generate_password_hash, 
                           check_password_hash)
 
-from .models import Users, db
+from .models import User, db
 
 from datetime import timedelta
 
@@ -44,7 +44,7 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(id):
-    return Users.query.get(id)
+    return User.query.get(id)
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
@@ -61,7 +61,7 @@ def signup():
         hashedPassword = bcrypt.generate_password_hash(password).decode("utf-8")
         
         # Check if the username or email is already registered
-        if Users.query.filter_by(email=email).first():
+        if User.query.filter_by(email=email).first():
             flash('Looks like this email already has an account with us. Try Logging In','error')
             return redirect(url_for('login'))
         
@@ -73,7 +73,7 @@ def signup():
         elif not firstname or not lastname or not email or not  password or not role:
             flash('There are missing values in your submission!','error')
         else:
-            new_user = Users(
+            new_user = User(
                 firstname=firstname,
                 lastname=lastname,
                 email=email,
@@ -95,7 +95,7 @@ def login():
 
         duration = timedelta(days=1)
 
-        user = Users.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
         if not email or not password:
             flash('Both email/username and password are required.', category='error')
         if user:
@@ -112,7 +112,7 @@ def login():
                       category='success')
                 return redirect(next_page)
                   
-                # Users of different roles get redirected here
+                # User of different roles get redirected here
             if user.role == 'customer':
                 flash(f'Welcome back {current_user.firstname}!', 
                       category='success')
@@ -120,7 +120,7 @@ def login():
             
             flash(f'Welcome back {current_user.firstname}! Ready for new tasks today?',
                   category='success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('profile'))
         
         flash('Login failed. Please check your email and password.', category='error')   
 

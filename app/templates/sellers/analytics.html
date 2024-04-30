@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Analytics</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Total Ratings</p>
+                <p class="text-3xl font-bold text-gray-900">{{ total_ratings }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Average Rating</p>
+                <p class="text-3xl font-bold text-gray-900">{{ average_rating }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Total Deliverables</p>
+                <p class="text-3xl font-bold text-gray-900">{{ total_deliverables }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Approved Deliverables</p>
+                <p class="text-3xl font-bold text-gray-900">{{ approved_deliverables }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Total Jobs</p>
+                <p class="text-3xl font-bold text-gray-900">{{ total_jobs }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <p class="text-gray-600 text-sm font-semibold">Completed Jobs</p>
+                <p class="text-3xl font-bold text-gray-900">{{ completed_jobs }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

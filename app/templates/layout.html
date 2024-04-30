@@ -41,9 +41,10 @@
           {% if current_user.role == 'customer' %}
           <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('marketplace')}}">Marketplace</a></li>
           <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('listing')}}">Post a job</a></li>
-          <li class=""><a class="text-gray-600 hover:text-blue-600" href="#">Profile</a></li>
+          <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('create_client_profile')}}">Profile</a></li>
           {% else %}
           <li class=""><a class="text-gray-600 hover:text-blue-600" href="{{url_for('dashboard')}}">Dashboard</a></li>
+          {% endif %}
           {% if not current_user.is_authenticated %}
           <li class="mt-2 sm:mt-0"><a class="rounded-xl border-2 border-blue-600 px-6 py-2 font-medium text-blue-600 hover:bg-blue-600 hover:text-white" href="{{url_for('login')}}">Login</a></li>
           <li class="mt-2 sm:mt-0"><a class="rounded-xl border-2 border-blue-600 px-6 py-2 font-medium text-blue-600 hover:bg-blue-600 hover:text-white" href="{{url_for('signup')}}">Sign up</a></li>
@@ -130,7 +131,7 @@
 {% endblock body %}
 
   
-
+<script src="{{ url_for('static', filename='notifications.js') }}"></script>
 
   <script>
     function copyToClipboard() {

@@ -1,0 +1,36 @@
+<!-- analytics.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Dashboard</title>
+</head>
+<body>
+    <h1>Analytics Dashboard</h1>
+
+    <h2>Last Week</h2>
+    <p>New Users: {{ new_users_last_week }}</p>
+    <p>New Freelancers: {{ new_freelancers_last_week }}</p>
+    <p>Completed Jobs: {{ completed_jobs_last_week }}</p>
+    <p>Total Earnings: {{ earnings_last_week }}</p>
+    <p>Average Rating: {{ avg_rating_last_week }}</p>
+    <h3>Top Freelancers</h3>
+    <ul>
+        {% for freelancer in top_freelancers_last_week %}
+        <li>{{ freelancer.firstname }} {{ freelancer.lastname }} ({{ freelancer.job_count }} jobs)</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Last Month</h2>
+    <p>New Users: {{ new_users_last_month }}</p>
+    <p>New Freelancers: {{ new_freelancers_last_month }}</p>
+    <p>Completed Jobs: {{ completed_jobs_last_month }}</p>
+    <p>Total Earnings: {{ earnings_last_month }}</p>
+    <p>Average Rating: {{ avg_rating_last_month }}</p>
+    <h3>Top Freelancers</h3>
+    <ul>
+        {% for freelancer in top_freelancers_last_month %}
+        <li>{{ freelancer.firstname }} {{ freelancer.lastname }} ({{ freelancer.job_count }} jobs)</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

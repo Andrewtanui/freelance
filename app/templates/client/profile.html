@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+        <h2 class="text-2xl font-bold mb-4">Client Profile</h2>
+        <form method="POST" action="{{ url_for('create_client_profile') }}">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_name">
+                    Company Name
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_name" name="company_name" type="text" placeholder="Enter your company name" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_description">
+                    Company Description
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_description" name="company_description" rows="3" placeholder="Enter your company description"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_website">
+                    Company Website
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_website" name="company_website" type="text" placeholder="Enter your company website">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_address">
+                    Company Address
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_address" name="company_address" type="text" placeholder="Enter your company address" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_city">
+                    Company City
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_city" name="company_city" type="text" placeholder="Enter your company city" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="company_country">
+                    Company Country
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="company_country" name="company_country" type="text" placeholder="Enter your company country" required>
+            </div>
+            <div class="flex items-center justify-between">
+                <button class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Save Profile
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock body %}

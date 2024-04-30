@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <h2>Users</h2>
+    <ul>
+        {% for user in users %}
+        <li>{{ user.get_full_name() }} ({{ user.role }})</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Freelancers</h2>
+    <ul>
+        {% for freelancer in freelancers %}
+        <li>{{ freelancer.user.get_full_name() }} ({{ freelancer.skill }})</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Jobs</h2>
+    <ul>
+        {% for job in jobs %}
+        <li>{{ job.title }} ({{ job.status }})</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Listings</h2>
+    <ul>
+        {% for listing in listings %}
+        <li>{{ listing.title }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Applications</h2>
+    <ul>
+        {% for application in applications %}
+        <li>{{ application.freelancer.get_full_name() }} - {{ application.listing.title }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
