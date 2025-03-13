@@ -1,0 +1,119 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900">Search Results</h1>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Showing results for "{{ query }}" in {{ search_type }}
+            </p>
+        </div>
+
+        <!-- Search Tabs -->
+        <div class="border-t border-gray-200">
+            <div class="px-4 py-5 sm:px-6">
+                <div class="flex space-x-4 mb-6">
+                    <a href="{{ url_for('search', q=query, type='projects') }}" class="px-4 py-2 rounded-md {% if search_type == 'projects' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                        Projects
+                    </a>
+                    <a href="{{ url_for('search', q=query, type='freelancers') }}" class="px-4 py-2 rounded-md {% if search_type == 'freelancers' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                        Freelancers
+                    </a>
+                </div>
+
+                <!-- Search Form -->
+                <form action="{{ url_for('search') }}" method="GET" class="mb-8">
+                    <div class="flex">
+                        <input type="text" name="q" value="{{ query }}" required
+                            class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-l-md p-2 border"
+                            placeholder="Search for projects or freelancers...">
+                        <input type="hidden" name="type" value="{{ search_type }}">
+                        <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                            </svg>
+                            Search
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results -->
+                {% if results %}
+                    {% if search_type == 'projects' %}
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            {% for project in results %}
+                                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
+                                    <div class="px-4 py-5 sm:p-6">
+                                        <h3 class="text-lg font-medium text-gray-900">
+                                            <a href="{{ url_for('view_project', project_id=project.id) }}" class="hover:text-indigo-600">
+                                                {{ project.title }}
+                                            </a>
+                                        </h3>
+                                        <p class="mt-1 text-sm text-gray-500">{{ project.description|truncate(100) }}</p>
+                                        <div class="mt-4 flex items-center justify-between">
+                                            <div>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    {{ project.category }}
+                                                </span>
+                                                <span class="ml-2 text-xs text-gray-500">Posted {{ project.created_at.strftime('%b %d, %Y') }}</span>
+                                            </div>
+                                            <div class="text-sm font-medium text-gray-900">${{ project.budget }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            {% for result in results %}
+                                <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
+                                    <div class="px-4 py-5 sm:p-6">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-12 w-12">
+                                                {% if result.profile.profile_picture %}
+                                                    <img class="h-12 w-12 rounded-full" src="{{ url_for('static', filename='uploads/' + result.profile.profile_picture) }}" alt="Profile picture">
+                                                {% else %}
+                                                    <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                                        <span class="text-lg font-medium text-white">{{ result.user.firstname[0] }}{{ result.user.lastname[0] }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="ml-4">
+                                                <h3 class="text-lg font-medium text-gray-900">
+                                                    <a href="{{ url_for('view_freelancer', user_id=result.user.id) }}" class="hover:text-indigo-600">
+                                                        {{ result.user.firstname }} {{ result.user.lastname }}
+                                                    </a>
+                                                </h3>
+                                                <p class="text-sm text-gray-500">{{ result.profile.skill }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <p class="text-sm text-gray-500">{{ result.profile.bio|truncate(100) if result.profile.bio else 'No bio available' }}</p>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <div class="text-sm font-medium text-gray-900">${{ result.profile.hourly_rate }}/hr</div>
+                                            <a href="{{ url_for('view_freelancer', user_id=result.user.id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                View Profile
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No results found</h3>
+                        <p class="mt-1 text-sm text-gray-500">Try adjusting your search terms or filters.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

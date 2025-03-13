@@ -1,58 +1,335 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
-{% block dashboardbody %}
-<div class="p-6 overflow-auto bg-gray-800 flex items-center justify-center text-gray-800 bg-gray-200">
+{% block body %}
+<div class="bg-gray-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ title }}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Tile 1: Revenue/Earnings -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+            <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                {% if current_user.role == 'customer' %}
+                  Project Spending
+                {% else %}
+                  Earnings
+                {% endif %}
+              </dt>
+              <dd class="flex items-baseline">
+                <div class="text-2xl font-semibold text-gray-900">
+                  {% if current_user.role == 'customer' %}
+                    KES {{ '%0.2f'|format(active_projects|sum(attribute='budget')) if active_projects else '0.00' }}
+                  {% else %}
+                    KES {{ '%0.2f'|format(active_proposals|sum(attribute='bid_amount')) if active_proposals else '0.00' }}
+                  {% endif %}
+                </div>
+                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="sr-only">Increased by</span>
+                  {% if current_user.role == 'customer' %}
+                    {{ active_projects|length }}% 
+                  {% else %}
+                    {{ active_proposals|length }}%
+                  {% endif %}
+                </div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
 
-        
-  <!-- Admin dashboard content----->
-  <!-- Tile 1 -->
-  <div class="flex items-center p-4 bg-white rounded mr-2">
-    <div class="flex flex-shrink-0 items-center justify-center bg-green-200 h-16 w-16 rounded">
-      <svg class="w-6 h-6 fill-current text-green-700"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-      </svg>
+      <!-- Tile 2: Active Projects/Proposals -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                {% if current_user.role == 'customer' %}
+                  Active Projects
+                {% else %}
+                  Active Contracts
+                {% endif %}
+              </dt>
+              <dd class="flex items-baseline">
+                <div class="text-2xl font-semibold text-gray-900">
+                  {% if current_user.role == 'customer' %}
+                    {{ active_projects|length }}
+                  {% else %}
+                    {{ active_proposals|length }}
+                  {% endif %}
+                </div>
+                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="sr-only">Increased by</span>
+                  New
+                </div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 3: Pending/Completed -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+            <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                {% if current_user.role == 'customer' %}
+                  Completed Projects
+                {% else %}
+                  Pending Proposals
+                {% endif %}
+              </dt>
+              <dd class="flex items-baseline">
+                <div class="text-2xl font-semibold text-gray-900">
+                  {% if current_user.role == 'customer' %}
+                    {{ completed_projects|length }}
+                  {% else %}
+                    {{ pending_proposals|length }}
+                  {% endif %}
+                </div>
+                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="sr-only">Increased by</span>
+                  Active
+                </div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="flex-grow flex flex-col ml-4">
-      <span class="text-xl font-bold">KES 8,430</span>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-500">Revenue last 30 days</span>
-        <span class="text-green-500 text-sm font-semibold ml-2">+12.6%</span>
+
+    <!-- Recent Activity Section -->
+    <div class="mt-8">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
+      
+      {% if current_user.role == 'customer' %}
+        <!-- Client's Recent Activity -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <ul class="divide-y divide-gray-200">
+            {% if active_projects %}
+              {% for project in active_projects %}
+                <li>
+                  <a href="{{ url_for('view_project', project_id=project.id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-indigo-600 truncate">{{ project.title }}</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                          <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if project.status == 'open' %}bg-green-100 text-green-800
+                            {% elif project.status == 'in_progress' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ project.status|replace('_', ' ')|title }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                          <p class="flex items-center text-sm text-gray-500">{{ project.category }}</p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                          </svg>
+                          <p>Posted {{ project.created_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            {% else %}
+              <li class="px-4 py-5 sm:px-6">
+                <p class="text-sm text-gray-500">No active projects found. <a href="{{ url_for('new_project') }}" class="text-indigo-600 hover:text-indigo-900">Create a new project</a>.</p>
+              </li>
+            {% endif %}
+            
+            {% if proposals %}
+              {% for proposal in proposals %}
+                <li>
+                  <a href="{{ url_for('view_project', project_id=proposal.project_id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-indigo-600 truncate">New proposal received</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                          <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if proposal.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif proposal.status == 'accepted' %}bg-green-100 text-green-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ proposal.status|title }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                          <p class="flex items-center text-sm text-gray-500">{{ proposal.project.title }}</p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                          </svg>
+                          <p>Received {{ proposal.created_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      {% else %}
+        <!-- Freelancer's Recent Activity -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <ul class="divide-y divide-gray-200">
+            {% if active_proposals %}
+              {% for proposal in active_proposals %}
+                <li>
+                  <a href="{{ url_for('view_project', project_id=proposal.project_id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-indigo-600 truncate">{{ proposal.project.title }}</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                          <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</p>
+                        </div>
+                      </div>
+                      <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                          <p class="flex items-center text-sm text-gray-500">Bid: KES {{ '%0.2f'|format(proposal.bid_amount) }}</p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                          </svg>
+                          <p>Accepted {{ proposal.updated_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            {% endif %}
+            
+            {% if pending_proposals %}
+              {% for proposal in pending_proposals %}
+                <li>
+                  <a href="{{ url_for('view_project', project_id=proposal.project_id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-indigo-600 truncate">{{ proposal.project.title }}</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                          <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</p>
+                        </div>
+                      </div>
+                      <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                          <p class="flex items-center text-sm text-gray-500">Bid: KES {{ '%0.2f'|format(proposal.bid_amount) }}</p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                          </svg>
+                          <p>Submitted {{ proposal.created_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            {% endif %}
+            
+            {% if awarded_projects %}
+              {% for project in awarded_projects %}
+                <li>
+                  <a href="{{ url_for('view_project', project_id=project.id) }}" class="block hover:bg-gray-50">
+                    <div class="px-4 py-4 sm:px-6">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-indigo-600 truncate">{{ project.title }}</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                          <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if project.status == 'in_progress' %}bg-blue-100 text-blue-800
+                            {% elif project.status == 'completed' %}bg-green-100 text-green-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ project.status|replace('_', ' ')|title }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                          <p class="flex items-center text-sm text-gray-500">{{ project.category }}</p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                          </svg>
+                          <p>Awarded {{ project.updated_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            {% endif %}
+            
+            {% if not active_proposals and not pending_proposals and not awarded_projects %}
+              <li class="px-4 py-5 sm:px-6">
+                <p class="text-sm text-gray-500">No activity found. <a href="{{ url_for('marketplace') }}" class="text-indigo-600 hover:text-indigo-900">Browse available projects</a>.</p>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Actions Section -->
+    <div class="mt-8">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 sm:mb-0">Quick Actions</h2>
+        <div class="space-y-2 sm:space-y-0 sm:space-x-3 sm:flex">
+          {% if current_user.role == 'customer' %}
+            <a href="{{ url_for('new_project') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Post New Project
+            </a>
+            <a href="{{ url_for('marketplace') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              View Marketplace
+            </a>
+          {% else %}
+            <a href="{{ url_for('marketplace') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Find Projects
+            </a>
+            <a href="{{ url_for('profile') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Update Profile
+            </a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
-  
-  <!-- Tile 2 -->
-  <div class="flex items-center p-4 bg-white rounded mr-2">
-    <div class="flex flex-shrink-0 items-center justify-center bg-red-200 h-16 w-16 rounded">
-      <svg class="w-6 h-6 fill-current text-red-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="flex-grow flex flex-col ml-4">
-      <span class="text-xl font-bold">211</span>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-500">Sales last 30 days</span>
-        <span class="text-red-500 text-sm font-semibold ml-2">-8.1%</span>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Tile 3 -->
-  <div class="flex items-center p-4 bg-white rounded mr-3">
-    <div class="flex flex-shrink-0 items-center justify-center bg-green-200 h-16 w-16 rounded">
-      <svg class="w-6 h-6 fill-current text-green-700"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="flex-grow flex flex-col ml-4">
-      <span class="text-xl font-bold">140</span>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-500">Customers last 30 days</span>
-        <span class="text-green-500 text-sm font-semibold ml-2">+28.4%</span>
-      </div>
-    </div>
-  </div>
-  
 </div>
-
-{% endblock dashboardbody %}
+{% endblock body %}

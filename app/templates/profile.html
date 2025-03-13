@@ -1,40 +1,139 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
-{% block dashboardbody %}
+{% block body %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <!-- Profile Header -->
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h1 class="text-2xl font-bold text-gray-900">Profile Settings</h1>
+            <p class="mt-1 text-sm text-gray-500">Update your personal information and account settings</p>
+        </div>
 
-<div class="mx-auto max-w-screen-xl w-full px-2 py-10">
-    <div class="flex flex-col border-b py-4 sm:flex-row sm:items-start">
-      <div class="shrink-0 mr-auto sm:py-3">
-        <p class="font-medium">Account Details</p>
-        <p class="text-sm text-gray-600">Edit your account details</p>
-      </div>
-      <button class="mr-2 hidden rounded-lg border-2 px-4 py-2 font-medium text-gray-500 sm:inline focus:outline-none focus:ring hover:bg-gray-200">Cancel</button>
-      <button class="hidden rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white sm:inline focus:outline-none focus:ring hover:bg-blue-700">Save</button>
+        <!-- Profile Form -->
+        <form action="{{ url_for('edit_profile') }}" method="POST" enctype="multipart/form-data" class="divide-y divide-gray-200">
+            <!-- Account Information Section -->
+            <div class="px-4 py-5 sm:p-6">
+                <div class="md:grid md:grid-cols-3 md:gap-6">
+                    <div class="md:col-span-1">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Account Information</h3>
+                        <p class="mt-1 text-sm text-gray-500">Basic information about your account</p>
+                    </div>
+                    <div class="mt-5 md:mt-0 md:col-span-2">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="firstname" class="block text-sm font-medium text-gray-700">First name</label>
+                                <input type="text" name="firstname" id="firstname" value="{{ current_user.firstname }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="lastname" class="block text-sm font-medium text-gray-700">Last name</label>
+                                <input type="text" name="lastname" id="lastname" value="{{ current_user.lastname }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-4">
+                                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                                <input type="email" name="email" id="email" value="{{ current_user.email }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="phonenumber" class="block text-sm font-medium text-gray-700">Phone number</label>
+                                <input type="text" name="phonenumber" id="phonenumber" value="{{ current_user.phonenumber }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture Section -->
+            <div class="px-4 py-5 sm:p-6">
+                <div class="md:grid md:grid-cols-3 md:gap-6">
+                    <div class="md:col-span-1">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Profile Picture</h3>
+                        <p class="mt-1 text-sm text-gray-500">Upload a professional photo for your profile</p>
+                    </div>
+                    <div class="mt-5 md:mt-0 md:col-span-2">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-24 w-24 overflow-hidden rounded-full">
+                                {% if profile and profile.profile_picture %}
+                                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_picture) }}" alt="Profile picture" class="h-24 w-24 object-cover">
+                                {% else %}
+                                    <div class="h-24 w-24 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <span class="text-2xl font-medium text-white">{{ current_user.firstname[0] }}{{ current_user.lastname[0] }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="ml-5">
+                                <div class="relative bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm flex items-center cursor-pointer hover:bg-gray-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <label for="profile_picture" class="relative text-sm font-medium text-indigo-600 pointer-events-none">
+                                        <span>Change</span>
+                                        <span class="sr-only"> profile picture</span>
+                                    </label>
+                                    <input id="profile_picture" name="profile_picture" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer border-gray-300 rounded-md">
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information Section (Only for Freelancers) -->
+            {% if current_user.role != 'customer' %}
+            <div class="px-4 py-5 sm:p-6">
+                <div class="md:grid md:grid-cols-3 md:gap-6">
+                    <div class="md:col-span-1">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Professional Information</h3>
+                        <p class="mt-1 text-sm text-gray-500">Information that will be displayed on your public profile</p>
+                    </div>
+                    <div class="mt-5 md:mt-0 md:col-span-2">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6">
+                                <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                                <textarea id="bio" name="bio" rows="4" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">{{ profile.bio if profile else '' }}</textarea>
+                                <p class="mt-2 text-sm text-gray-500">Brief description for your profile. URLs are hyperlinked.</p>
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="skill" class="block text-sm font-medium text-gray-700">Skills</label>
+                                <input type="text" name="skill" id="skill" value="{{ profile.skill if profile else '' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                                <p class="mt-2 text-sm text-gray-500">Separate skills with commas (e.g., Web Design, Python, UI/UX)</p>
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="hourly_rate" class="block text-sm font-medium text-gray-700">Hourly Rate ($)</label>
+                                <input type="number" name="hourly_rate" id="hourly_rate" value="{{ profile.hourly_rate if profile else '' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                                <input type="text" name="city" id="city" value="{{ profile.city if profile else '' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                                <input type="text" name="country" id="country" value="{{ profile.country if profile else '' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                            </div>
+
+                            <div class="col-span-6">
+                                <label for="experience" class="block text-sm font-medium text-gray-700">Experience</label>
+                                <textarea id="experience" name="experience" rows="3" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">{{ profile.experience if profile else '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Form Actions -->
+            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <a href="{{ url_for('dashboard') }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-      <p class="shrink-0 w-32 font-medium">Name</p>
-      <input placeholder="First Name" class="mb-2 w-full rounded-md border px-2 py-2 outline-none ring-blue-600 sm:mr-4 sm:mb-0 focus:ring-1" value="{{current_user.firstname}}"/>
-      <input placeholder="Last Name" class="w-full rounded-md border bg-gray-700 px-2 py-2 outline-none ring-blue-600 focus:ring-1" value="{{current_user.lastname}}"/>
-    </div>
-    <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-      <p class="shrink-0 w-32 font-medium">Email</p>
-      <input placeholder="your.email@domain.com" class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-blue-600 focus:ring-1" value="{{current_user.email}}"/>
-    </div>
-    <div class="flex flex-col gap-4 py-4  lg:flex-row">
-      <div class="shrink-0 w-32  sm:py-4">
-        <p class="mb-auto font-medium">Avatar</p>
-        <p class="text-sm text-gray-600">Change your avatar</p>
-      </div>
-      <div class="flex h-56 w-full flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-gray-300 p-5 text-center">
-        <img src="{{url_for('static', filename='uploads/default.png')}}" class="h-16 w-16 rounded-full" />
-        <p class="text-sm text-gray-600">Drop your desired image file here to start the upload</p>
-        <input type="file" class="max-w-full rounded-lg px-2 font-medium text-blue-600 outline-none ring-blue-600 focus:ring-1" />
-      </div>
-    </div>
-    <div class="flex justify-end py-4 sm:hidden">
-      <button class="mr-2 rounded-lg border-2 px-4 py-2 font-medium text-gray-500 focus:outline-none focus:ring hover:bg-gray-200">Cancel</button>
-      <button class="rounded-lg border-2 border-transparent bg-blue-600 px-4 py-2 font-medium text-white focus:outline-none focus:ring hover:bg-blue-700">Save</button>
-    </div>
-  </div>
-  
-{% endblock dashboardbody %}
+</div>
+{% endblock body %}

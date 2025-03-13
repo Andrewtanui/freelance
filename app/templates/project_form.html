@@ -4,33 +4,40 @@
 <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6">
-            <h1 class="text-2xl font-bold leading-7 text-gray-900">Create New Project</h1>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">Post a new project to find the perfect freelancer</p>
+            <h1 class="text-2xl font-bold leading-7 text-gray-900">
+                {% if is_edit %}Edit Project{% else %}Create New Project{% endif %}
+            </h1>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                {% if is_edit %}Update your project details{% else %}Post a new project to find the perfect freelancer{% endif %}
+            </p>
         </div>
         <div class="border-t border-gray-200">
-            <form method="POST" action="{{ url_for('new_project') }}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
+            <form method="POST" action="{% if is_edit %}{{ url_for('edit_project', project_id=project.id) }}{% else %}{{ url_for('new_project') }}{% endif %}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
                 <div class="grid grid-cols-6 gap-6">
                     <div class="col-span-6">
                         <label for="title" class="block text-sm font-medium text-gray-700">Project Title</label>
                         <input type="text" name="title" id="title" required
+                            value="{% if is_edit %}{{ project.title }}{% endif %}"
                             class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
 
                     <div class="col-span-6">
                         <label for="description" class="block text-sm font-medium text-gray-700">Project Description</label>
                         <textarea id="description" name="description" rows="5" required
-                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"></textarea>
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">{% if is_edit %}{{ project.description }}{% endif %}</textarea>
                     </div>
 
                     <div class="col-span-6 sm:col-span-3">
-                        <label for="budget" class="block text-sm font-medium text-gray-700">Budget ($)</label>
+                        <label for="budget" class="block text-sm font-medium text-gray-700">Budget (KES)</label>
                         <input type="number" name="budget" id="budget" min="5" step="0.01" required
+                            value="{% if is_edit %}{{ project.budget }}{% endif %}"
                             class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
 
                     <div class="col-span-6 sm:col-span-3">
                         <label for="deadline" class="block text-sm font-medium text-gray-700">Deadline (Optional)</label>
                         <input type="date" name="deadline" id="deadline"
+                            value="{% if is_edit and project.deadline %}{{ project.deadline.strftime('%Y-%m-%d') }}{% endif %}"
                             class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
 
@@ -39,20 +46,21 @@
                         <select id="category" name="category" required
                             class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">Select a category</option>
-                            <option value="Web Development">Web Development</option>
-                            <option value="Mobile App Development">Mobile App Development</option>
-                            <option value="Design">Design</option>
-                            <option value="Writing">Writing</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Data Entry">Data Entry</option>
-                            <option value="Virtual Assistant">Virtual Assistant</option>
-                            <option value="Other">Other</option>
+                            <option value="Web Development" {% if is_edit and project.category == 'Web Development' %}selected{% endif %}>Web Development</option>
+                            <option value="Mobile App Development" {% if is_edit and project.category == 'Mobile App Development' %}selected{% endif %}>Mobile App Development</option>
+                            <option value="Design" {% if is_edit and project.category == 'Design' %}selected{% endif %}>Design</option>
+                            <option value="Writing" {% if is_edit and project.category == 'Writing' %}selected{% endif %}>Writing</option>
+                            <option value="Marketing" {% if is_edit and project.category == 'Marketing' %}selected{% endif %}>Marketing</option>
+                            <option value="Data Entry" {% if is_edit and project.category == 'Data Entry' %}selected{% endif %}>Data Entry</option>
+                            <option value="Virtual Assistant" {% if is_edit and project.category == 'Virtual Assistant' %}selected{% endif %}>Virtual Assistant</option>
+                            <option value="Other" {% if is_edit and project.category == 'Other' %}selected{% endif %}>Other</option>
                         </select>
                     </div>
 
                     <div class="col-span-6 sm:col-span-3">
                         <label for="skills" class="block text-sm font-medium text-gray-700">Required Skills (comma separated)</label>
                         <input type="text" name="skills" id="skills" placeholder="e.g. Python, JavaScript, UI/UX"
+                            value="{% if is_edit and project.skills_required %}{{ project.skills_required }}{% endif %}"
                             class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
                 </div>
@@ -60,7 +68,7 @@
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button type="submit"
                         class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Post Project
+                        {% if is_edit %}Update Project{% else %}Post Project{% endif %}
                     </button>
                 </div>
             </form>

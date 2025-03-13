@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from .models import db, Users, Seller, Project, Proposal, Review, Message
+from .models import db, Users, Seller, Project, Proposal, Review, Message, Notification
 from datetime import datetime
 
 @app.route('/')
@@ -140,7 +140,7 @@ def view_project(project_id):
         proposals = Proposal.query.filter_by(project_id=project_id).all()
     
     return render_template(
-        'project_detail.html',
+        'project_details.html',
         title=project.title,
         project=project,
         client=client,
@@ -268,6 +268,64 @@ def complete_project(project_id):
     flash('Project marked as complete!', 'success')
     return redirect(url_for('view_project', project_id=project_id))
 
+@app.route('/project/<project_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_project(project_id):
+    """Route to edit an existing project"""
+    project = Project.query.get_or_404(project_id)
+    
+    # Check if the current user is the project owner
+    if current_user.id != project.client_id:
+        flash('You do not have permission to edit this project', 'error')
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    # Check if the project is still editable (not in progress or completed)
+    if project.status not in ['open', 'cancelled']:
+        flash('This project cannot be edited in its current state', 'warning')
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        budget = request.form.get('budget')
+        category = request.form.get('category')
+        skills_required = request.form.get('skills')
+        deadline_str = request.form.get('deadline')
+        
+        # Validate inputs
+        if not title or not description or not budget or not category:
+            flash('Please fill in all required fields', 'error')
+            return redirect(url_for('edit_project', project_id=project_id))
+        
+        try:
+            budget = float(budget)
+            deadline = datetime.strptime(deadline_str, '%Y-%m-%d') if deadline_str else None
+            
+            # Update project
+            project.title = title
+            project.description = description
+            project.budget = budget
+            project.category = category
+            project.skills_required = skills_required
+            project.deadline = deadline
+            project.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            
+            flash('Project updated successfully!', 'success')
+            return redirect(url_for('view_project', project_id=project_id))
+            
+        except ValueError:
+            flash('Invalid input values', 'error')
+            return redirect(url_for('edit_project', project_id=project_id))
+    
+    return render_template(
+        'project_form.html',
+        title='Edit Project',
+        project=project,
+        is_edit=True
+    )
+
 @app.route('/profile')
 @login_required
 def profile():
@@ -362,107 +420,168 @@ def edit_profile():
 @app.route('/messages')
 @login_required
 def messages():
-    """Route to view user messages"""
-    # Get all messages where user is sender or receiver
+    """Route to view all messages"""
+    # Get all conversations
     sent_messages = Message.query.filter_by(sender_id=current_user.id).all()
     received_messages = Message.query.filter_by(receiver_id=current_user.id).all()
     
-    # Get unique conversation partners
-    conversation_partners = set()
-    for msg in sent_messages:
-        conversation_partners.add(msg.receiver_id)
-    for msg in received_messages:
-        conversation_partners.add(msg.sender_id)
+    # Create a set of unique user IDs from conversations
+    conversation_user_ids = set()
+    for message in sent_messages:
+        conversation_user_ids.add(message.receiver_id)
+    for message in received_messages:
+        conversation_user_ids.add(message.sender_id)
     
-    # Get user info for each conversation partner
+    # Get user info and latest message for each conversation
     conversations = []
-    for partner_id in conversation_partners:
-        partner = Users.query.get(partner_id)
-        if partner:
-            # Get latest message
-            latest_message = Message.query.filter(
-                ((Message.sender_id == current_user.id) & (Message.receiver_id == partner_id)) |
-                ((Message.sender_id == partner_id) & (Message.receiver_id == current_user.id))
-            ).order_by(Message.created_at.desc()).first()
-            
-            conversations.append({
-                'partner': partner,
-                'latest_message': latest_message
-            })
+    for user_id in conversation_user_ids:
+        other_user = Users.query.get(user_id)
+        latest_message = Message.query.filter(
+            ((Message.sender_id == current_user.id) & (Message.receiver_id == user_id)) |
+            ((Message.sender_id == user_id) & (Message.receiver_id == current_user.id))
+        ).order_by(Message.created_at.desc()).first()
+        
+        # Count unread messages
+        unread_count = Message.query.filter_by(
+            sender_id=user_id,
+            receiver_id=current_user.id,
+            is_read=False
+        ).count()
+        
+        conversations.append({
+            'user': other_user,
+            'latest_message': latest_message,
+            'unread_count': unread_count
+        })
     
-    return render_template(
-        'messages.html',
-        title='My Messages',
-        conversations=conversations
-    )
+    # Sort conversations by latest message time
+    conversations.sort(key=lambda x: x['latest_message'].created_at if x['latest_message'] else datetime.min, reverse=True)
+    
+    return render_template('messages.html', conversations=conversations)
 
-@app.route('/messages/<user_id>', methods=['GET', 'POST'])
+@app.route('/conversation/<user_id>')
+@app.route('/conversation/<user_id>/<project_id>')
 @login_required
-def conversation(user_id):
+def conversation(user_id, project_id=None):
     """Route to view and send messages to a specific user"""
-    partner = Users.query.get_or_404(user_id)
+    # Get the other user
+    other_user = Users.query.get_or_404(user_id)
     
-    if request.method == 'POST':
-        content = request.form.get('message')
-        project_id = request.form.get('project_id')
-        
-        if not content:
-            flash('Message cannot be empty', 'error')
-            return redirect(url_for('conversation', user_id=user_id))
-        
-        # Create new message
-        message = Message(
-            content=content,
-            sender_id=current_user.id,
-            receiver_id=user_id,
-            project_id=project_id if project_id else None
-        )
-        
-        db.session.add(message)
-        db.session.commit()
-        
-        return redirect(url_for('conversation', user_id=user_id))
-    
-    # Get all messages between current user and partner
+    # Get or create conversation
     messages = Message.query.filter(
         ((Message.sender_id == current_user.id) & (Message.receiver_id == user_id)) |
         ((Message.sender_id == user_id) & (Message.receiver_id == current_user.id))
-    ).order_by(Message.created_at).all()
+    ).order_by(Message.created_at.asc()).all()
     
-    # Mark unread messages as read
-    unread_messages = Message.query.filter_by(
-        sender_id=user_id,
-        receiver_id=current_user.id,
-        is_read=False
-    ).all()
+    # Get project if project_id is provided
+    project = None
+    if project_id:
+        project = Project.query.get_or_404(project_id)
     
-    for msg in unread_messages:
-        msg.is_read = True
-    
-    db.session.commit()
-    
-    # Get projects where both users are involved
-    shared_projects = []
-    if current_user.role == 'customer':
-        # Current user is client, partner is freelancer
-        shared_projects = Project.query.filter_by(
-            client_id=current_user.id,
-            awarded_to=user_id
-        ).all()
-    else:
-        # Current user is freelancer, partner is client
-        shared_projects = Project.query.filter_by(
-            client_id=user_id,
-            awarded_to=current_user.id
-        ).all()
+    # Mark messages as read
+    unread_messages = [m for m in messages if m.receiver_id == current_user.id and not m.is_read]
+    for message in unread_messages:
+        message.is_read = True
+    if unread_messages:
+        db.session.commit()
     
     return render_template(
         'conversation.html',
-        title=f'Conversation with {partner.get_full_name()}',
-        partner=partner,
+        other_user=other_user,
         messages=messages,
-        shared_projects=shared_projects
+        project=project
     )
+
+@app.route('/send_message/<user_id>', methods=['POST'])
+@login_required
+def send_message(user_id):
+    """Route to send a message to a user"""
+    content = request.form.get('content')
+    project_id = request.form.get('project_id')
+    
+    if not content:
+        flash('Message cannot be empty', 'error')
+        return redirect(url_for('conversation', user_id=user_id))
+    
+    message = Message(
+        content=content,
+        sender_id=current_user.id,
+        receiver_id=user_id,
+        project_id=project_id if project_id else None
+    )
+    
+    db.session.add(message)
+    db.session.commit()
+    
+    # If this is a project-related message, redirect to project conversation
+    if project_id:
+        return redirect(url_for('conversation', user_id=user_id, project_id=project_id))
+    return redirect(url_for('conversation', user_id=user_id))
+
+@app.route('/project/<project_id>/submit_proposal', methods=['GET', 'POST'])
+@login_required
+def submit_proposal(project_id):
+    """Route to submit a proposal for a project"""
+    if current_user.role != 'seller':
+        flash('Only freelancers can submit proposals', 'error')
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    project = Project.query.get_or_404(project_id)
+    
+    # Check if project is still open
+    if project.status != 'open':
+        flash('This project is no longer accepting proposals', 'error')
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    # Check if user has already submitted a proposal
+    existing_proposal = Proposal.query.filter_by(
+        project_id=project_id, 
+        freelancer_id=current_user.id
+    ).first()
+    
+    if existing_proposal:
+        flash('You have already submitted a proposal for this project', 'error')
+        return redirect(url_for('view_project', project_id=project_id))
+    
+    if request.method == 'POST':
+        bid_amount = request.form.get('bid_amount')
+        cover_letter = request.form.get('cover_letter')
+        estimated_completion_time = request.form.get('estimated_completion_time')
+        
+        try:
+            bid_amount = float(bid_amount)
+            estimated_completion_time = int(estimated_completion_time) if estimated_completion_time else None
+            
+            # Create new proposal
+            proposal = Proposal(
+                bid_amount=bid_amount,
+                cover_letter=cover_letter,
+                project_id=project_id,
+                freelancer_id=current_user.id,
+                estimated_completion_time=estimated_completion_time
+            )
+            
+            db.session.add(proposal)
+            
+            # Create notification for project owner
+            notification = Notification(
+                user_id=project.client_id,
+                title='New Proposal Received',
+                message=f'A new proposal has been submitted for your project "{project.title}"',
+                type='proposal'
+            )
+            db.session.add(notification)
+            
+            db.session.commit()
+            
+            flash('Proposal submitted successfully!', 'success')
+            return redirect(url_for('view_project', project_id=project_id))
+            
+        except (ValueError, TypeError):
+            flash('Invalid input values', 'error')
+            return redirect(url_for('view_project', project_id=project_id))
+    
+    return redirect(url_for('view_project', project_id=project_id))
 
 @app.route('/freelancers')
 @login_required

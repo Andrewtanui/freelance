@@ -1,3 +1,8 @@
+from app import db
+from flask_login import UserMixin
+import uuid
+from datetime import datetime
+
 from app import app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -12,24 +17,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
 class Users(UserMixin, db.Model):
-    """Users model for storing user data"""
+    """User model for storing user data"""
     __tablename__ = 'users'
     id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
-    firstname = db.Column(db.String(64), nullable=False)
-    lastname = db.Column(db.String(64), nullable=False)
-    password = db.Column(db.String(128))
-    email = db.Column(db.String(120), unique=True)
-    role = db.Column(db.String(10), nullable=False)
-    phonenumber = db.Column(db.String(15), unique=False, nullable=True)
+    firstname = db.Column(db.String(50), nullable=False)
+    lastname = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    role = db.Column(db.String(20), nullable=False)  # customer or seller
+    phonenumber = db.Column(db.String(20), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    projects = db.relationship('Project', backref='client', lazy=True, foreign_keys='Project.client_id')
-    proposals = db.relationship('Proposal', backref='freelancer', lazy=True, foreign_keys='Proposal.freelancer_id')
+    seller_profile = db.relationship('Seller', backref='user', lazy=True)
+    projects_posted = db.relationship('Project', backref='client', lazy=True, foreign_keys='Project.client_id')
+    projects_awarded = db.relationship('Project', backref='freelancer', lazy=True, foreign_keys='Project.awarded_to')
     reviews_given = db.relationship('Review', backref='reviewer', lazy=True, foreign_keys='Review.reviewer_id')
     reviews_received = db.relationship('Review', backref='reviewee', lazy=True, foreign_keys='Review.reviewee_id')
     messages_sent = db.relationship('Message', backref='sender', lazy=True, foreign_keys='Message.sender_id')
     messages_received = db.relationship('Message', backref='receiver', lazy=True, foreign_keys='Message.receiver_id')
-
+    proposals = db.relationship('Proposal', backref='freelancer', lazy=True)
+    
     def __init__(self, firstname, lastname, password, email, role, phonenumber):
         self.firstname = firstname
         self.lastname = lastname
@@ -37,6 +46,7 @@ class Users(UserMixin, db.Model):
         self.email = email
         self.role = role
         self.phonenumber = phonenumber
+        self.created_at = datetime.utcnow()
 
     def get_full_name(self):
         """Method to fetch the full name"""
@@ -60,8 +70,6 @@ class Seller(db.Model):
     is_available = db.Column(db.Boolean, default=True)
     languages = db.Column(db.String(255), nullable=True)
     
-    user = db.relationship('Users', backref='profile', uselist=False, lazy=True)
-
     def __init__(self, user_id, address, skill, city, country, bio=None, profile_picture=None,
                  hourly_rate=None, availability=None, is_available=True, languages=None):
         self.user_id = user_id
@@ -78,16 +86,16 @@ class Seller(db.Model):
 
 
 class Project(db.Model):
-    """Project model for storing project details"""
+    """Project model for storing project data"""
     __tablename__ = 'projects'
     id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     budget = db.Column(db.Float, nullable=False)
-    deadline = db.Column(db.DateTime, nullable=True)
     category = db.Column(db.String(50), nullable=False)
-    skills_required = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(20), default='open', nullable=False)  # open, in_progress, completed, cancelled
+    skills_required = db.Column(db.Text, nullable=True)
+    deadline = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -170,3 +178,4 @@ class Message(db.Model):
         self.sender_id = sender_id
         self.receiver_id = receiver_id
         self.project_id = project_id
+
