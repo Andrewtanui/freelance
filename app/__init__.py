@@ -6,7 +6,8 @@ from dotenv import load_dotenv, find_dotenv
 import os
 
 load_dotenv(find_dotenv())
-app.config['SECRET_KEY'] = os.getenv('APP_SECRET_KEY')
+# Provide a default secret key if the environment variable is not found
+app.config['SECRET_KEY'] = os.getenv('APP_SECRET_KEY') or 'default_secret_key_for_development'
 
 from . import (auth,
                  views,
@@ -14,4 +15,3 @@ from . import (auth,
                  customer,
                  search_marketplace,
                  models)
-

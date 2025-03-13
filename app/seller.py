@@ -3,8 +3,8 @@ from flask import render_template
 
 
   
-@app.route('/dashboard')
-def dashboard():
+@app.route('/seller/dashboard')
+def seller_dashboard():
   return render_template('dashboard.html')
 
 
@@ -13,6 +13,6 @@ def orders():
   return render_template('Orders.html')
 
 
-@app.route('/profile')
-def profile():
+@app.route('/seller/profile')
+def seller_profile():
   return render_template('profile.html')

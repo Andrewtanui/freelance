@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900">Leave a Review</h1>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">For: {{ freelancer.firstname }} {{ freelancer.lastname }} on project "{{ project.title }}"</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form method="POST" action="{{ url_for('submit_review', project_id=project.id, freelancer_id=freelancer.id) }}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                <div class="grid grid-cols-6 gap-6">
+                    <div class="col-span-6">
+                        <label for="rating" class="block text-sm font-medium text-gray-700">Rating</label>
+                        <div class="mt-1 flex items-center">
+                            <div class="flex items-center" x-data="{ rating: 0 }">
+                                <template x-for="i in 5">
+                                    <button type="button" 
+                                            @click="rating = i; document.getElementById('rating-input').value = i" 
+                                            :class="{ 'text-yellow-400': i <= rating, 'text-gray-300': i > rating }"
+                                            class="h-8 w-8 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </button>
+                                </template>
+                                <input type="hidden" name="rating" id="rating-input" value="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="title" class="block text-sm font-medium text-gray-700">Review Title</label>
+                        <input type="text" name="title" id="title" required
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="Summarize your experience in a few words">
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="content" class="block text-sm font-medium text-gray-700">Review Content</label>
+                        <textarea id="content" name="content" rows="5" required
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="Share details of your experience working with this freelancer..."></textarea>
+                    </div>
+
+                    <div class="col-span-6">
+                        <fieldset>
+                            <legend class="block text-sm font-medium text-gray-700">Would you recommend this freelancer?</legend>
+                            <div class="mt-2 space-y-2">
+                                <div class="flex items-center">
+                                    <input id="recommend-yes" name="recommend" type="radio" value="yes" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                    <label for="recommend-yes" class="ml-3 block text-sm font-medium text-gray-700">Yes</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="recommend-no" name="recommend" type="radio" value="no" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                    <label for="recommend-no" class="ml-3 block text-sm font-medium text-gray-700">No</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <a href="{{ url_for('project_details', project_id=project.id) }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock body %}

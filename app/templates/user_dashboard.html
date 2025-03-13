@@ -1,0 +1,287 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="bg-gray-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Stats Cards -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div class="ml-5">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% if current_user.is_freelancer %}
+                Active Proposals
+              {% else %}
+                Active Projects
+              {% endif %}
+            </h2>
+            <p class="text-2xl font-semibold text-gray-900">
+              {% if current_user.is_freelancer %}
+                {{ active_proposals|length }}
+              {% else %}
+                {{ active_projects|length }}
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-5">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% if current_user.is_freelancer %}
+                Earnings
+              {% else %}
+                Total Spent
+              {% endif %}
+            </h2>
+            <p class="text-2xl font-semibold text-gray-900">${{ earnings }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-5">
+            <h2 class="text-lg font-medium text-gray-900">Completed Projects</h2>
+            <p class="text-2xl font-semibold text-gray-900">{{ completed_projects|length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Projects/Proposals Section -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">
+              {% if current_user.is_freelancer %}
+                My Active Projects
+              {% else %}
+                My Projects
+              {% endif %}
+            </h3>
+            {% if not current_user.is_freelancer %}
+              <a href="{{ url_for('new_project') }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="-ml-0.5 mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                New Project
+              </a>
+            {% endif %}
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                  <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {% if current_user.is_freelancer and active_projects %}
+                  {% for project in active_projects %}
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ project.title }}</div>
+                        <div class="text-sm text-gray-500">{{ project.client.firstname }} {{ project.client.lastname }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          {% if project.status == 'open' %}bg-green-100 text-green-800
+                          {% elif project.status == 'in_progress' %}bg-blue-100 text-blue-800
+                          {% elif project.status == 'completed' %}bg-purple-100 text-purple-800
+                          {% elif project.status == 'cancelled' %}bg-red-100 text-red-800{% endif %}">
+                          {{ project.status|replace('_', ' ')|title }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ project.budget }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {% if project.deadline %}{{ project.deadline.strftime('%b %d, %Y') }}{% else %}No deadline{% endif %}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% elif not current_user.is_freelancer and projects %}
+                  {% for project in projects %}
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ project.title }}</div>
+                        <div class="text-sm text-gray-500">{{ project.proposals|length }} proposal(s)</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          {% if project.status == 'open' %}bg-green-100 text-green-800
+                          {% elif project.status == 'in_progress' %}bg-blue-100 text-blue-800
+                          {% elif project.status == 'completed' %}bg-purple-100 text-purple-800
+                          {% elif project.status == 'cancelled' %}bg-red-100 text-red-800{% endif %}">
+                          {{ project.status|replace('_', ' ')|title }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ project.budget }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {% if project.deadline %}{{ project.deadline.strftime('%b %d, %Y') }}{% else %}No deadline{% endif %}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      {% if current_user.is_freelancer %}
+                        No active projects found. Browse the marketplace to find projects!
+                      {% else %}
+                        No projects found. Create your first project to get started!
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <ul class="space-y-4">
+              {% if activities %}
+                {% for activity in activities %}
+                  <li class="flex space-x-3">
+                    <div class="flex-shrink-0">
+                      <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <svg class="h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-600">{{ activity.description }}</p>
+                      <p class="text-xs text-gray-500">{{ activity.timestamp.strftime('%b %d, %Y at %H:%M') }}</p>
+                    </div>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="text-sm text-gray-500 text-center py-4">No recent activity</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column -->
+      <div class="space-y-6">
+        <!-- Profile Card -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">Profile</h3>
+            <a href="{{ url_for('edit_profile') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Edit</a>
+          </div>
+          <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-20 w-20">
+                <div class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span class="text-2xl font-medium text-white">{{ current_user.firstname[0] }}{{ current_user.lastname[0] }}</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <h4 class="text-lg font-medium text-gray-900">{{ current_user.firstname }} {{ current_user.lastname }}</h4>
+                <p class="text-sm text-gray-500">{{ current_user.email }}</p>
+                <p class="text-sm text-gray-500">Member since {{ current_user.created_at.strftime('%B %Y') }}</p>
+              </div>
+            </div>
+            
+            {% if current_user.is_freelancer and current_user.seller %}
+              <div class="mt-4">
+                <h5 class="text-sm font-medium text-gray-900">Skills</h5>
+                <p class="text-sm text-gray-500">{{ current_user.seller.skill }}</p>
+              </div>
+              <div class="mt-2">
+                <h5 class="text-sm font-medium text-gray-900">Hourly Rate</h5>
+                <p class="text-sm text-gray-500">${{ current_user.seller.hourly_rate }}/hr</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Messages Preview -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">Recent Messages</h3>
+            <a href="{{ url_for('messages') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
+          </div>
+          <div class="border-t border-gray-200">
+            <ul class="divide-y divide-gray-200">
+              {% if recent_messages %}
+                {% for message in recent_messages %}
+                  <li>
+                    <a href="{{ url_for('messages', conversation_id=message.conversation_id) }}" class="block hover:bg-gray-50">
+                      <div class="px-4 py-4 sm:px-6">
+                        <div class="flex items-center justify-between">
+                          <p class="text-sm font-medium text-indigo-600 truncate">
+                            {% if message.sender_id == current_user.id %}
+                              {{ message.conversation.recipient.firstname }} {{ message.conversation.recipient.lastname }}
+                            {% else %}
+                              {{ message.sender.firstname }} {{ message.sender.lastname }}
+                            {% endif %}
+                          </p>
+                          <div class="ml-2 flex-shrink-0 flex">
+                            <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              {{ message.created_at.strftime('%b %d') }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="mt-2 sm:flex sm:justify-between">
+                          <div class="sm:flex">
+                            <p class="text-sm text-gray-500 truncate">
+                              {{ message.content|truncate(50) }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="px-4 py-5 text-center text-sm text-gray-500">No recent messages</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock body %}

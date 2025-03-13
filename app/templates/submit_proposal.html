@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900">Submit Proposal</h1>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">For: {{ project.title }}</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form method="POST" action="{{ url_for('submit_proposal', project_id=project.id) }}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                <div class="grid grid-cols-6 gap-6">
+                    <div class="col-span-6">
+                        <label for="bid_amount" class="block text-sm font-medium text-gray-700">Bid Amount ($)</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input type="number" name="bid_amount" id="bid_amount" min="5" step="0.01" required
+                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md p-2 border">
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Project budget: ${{ project.budget }}</p>
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="delivery_time" class="block text-sm font-medium text-gray-700">Estimated Delivery Time (days)</label>
+                        <input type="number" name="delivery_time" id="delivery_time" min="1" required
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="cover_letter" class="block text-sm font-medium text-gray-700">Cover Letter</label>
+                        <textarea id="cover_letter" name="cover_letter" rows="8" required
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="Introduce yourself, explain why you're a good fit for this project, and outline your approach..."></textarea>
+                        <p class="mt-1 text-sm text-gray-500">Explain your experience, approach, and why you're the best fit for this project.</p>
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="portfolio_links" class="block text-sm font-medium text-gray-700">Portfolio Links (Optional)</label>
+                        <textarea id="portfolio_links" name="portfolio_links" rows="3"
+                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="https://example.com/portfolio&#10;https://github.com/yourusername"></textarea>
+                        <p class="mt-1 text-sm text-gray-500">Add links to your relevant work (one per line)</p>
+                    </div>
+                </div>
+
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <a href="{{ url_for('project_details', project_id=project.id) }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Submit Proposal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock body %}
