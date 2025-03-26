@@ -1,6 +1,6 @@
 from flask_socketio import emit
-from app import socketio
-from app.models import Notification, Message
+from . import socketio, db
+from .models import Notification, Message, Proposal
 from datetime import datetime
 
 @socketio.on('send_message')
@@ -10,7 +10,7 @@ def handle_send_message(data):
         content=data['content'],
         sender_id=data['sender_id'],
         receiver_id=data['receiver_id'],
-        created_at=datetime.utcnow()
+        created_at=datetime.now()
     )
     db.session.add(message)
     db.session.commit()
@@ -19,7 +19,7 @@ def handle_send_message(data):
     emit('receive_message', {
         'content': data['content'],
         'sender_id': data['sender_id'],
-        'timestamp': datetime.utcnow().isoformat()
+        'timestamp': datetime.now().isoformat()
     }, room=data['receiver_id'])
 
 @socketio.on('submit_proposal')
@@ -30,7 +30,7 @@ def handle_submit_proposal(data):
         freelancer_id=data['freelancer_id'],
         cover_letter=data['cover_letter'],
         bid_amount=data['bid_amount'],
-        created_at=datetime.utcnow()
+        created_at=datetime.now()
     )
     db.session.add(proposal)
     db.session.commit()
@@ -39,5 +39,5 @@ def handle_submit_proposal(data):
     emit('new_proposal', {
         'project_id': data['project_id'],
         'freelancer_id': data['freelancer_id'],
-        'timestamp': datetime.utcnow().isoformat()
+        'timestamp': datetime.now().isoformat()
     }, room=data['client_id'])

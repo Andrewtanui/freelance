@@ -1,15 +1,18 @@
-from app import app
-from flask import render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from .models import db, Users, Seller, Project, Proposal, Review, Message, Notification
+from . import db
+from .models import Users, Seller, Project, Proposal, Review, Message, Notification
 from datetime import datetime
 
-@app.route('/')
+# Create blueprint
+bp = Blueprint('views', __name__, url_prefix="/v")
+
+@bp.route('/')
 def home():
     """Home page route"""
     return render_template('index.html')
 
-@app.route('/dashboard')
+@bp.route('/dashboard')
 @login_required
 def dashboard():
     """Dashboard route for both clients and freelancers"""
@@ -47,7 +50,7 @@ def dashboard():
             awarded_projects=awarded_projects
         )
 
-@app.route('/marketplace')
+@bp.route('/marketplace')
 @login_required
 def marketplace():
     """Marketplace route to browse available projects"""
@@ -69,7 +72,7 @@ def marketplace():
         user_proposal_project_ids=user_proposal_project_ids
     )
 
-@app.route('/project/new', methods=['GET', 'POST'])
+@bp.route('/project/new', methods=['GET', 'POST'])
 @login_required
 def new_project():
     """Route to create a new project"""
@@ -117,7 +120,7 @@ def new_project():
     
     return render_template('project_form.html', title='Create New Project')
 
-@app.route('/project/<project_id>')
+@bp.route('/project/<project_id>')
 @login_required
 def view_project(project_id):
     """Route to view a specific project"""
@@ -148,7 +151,7 @@ def view_project(project_id):
         proposals=proposals
     )
 
-@app.route('/project/<project_id>/proposal', methods=['GET', 'POST'])
+@bp.route('/project/<project_id>/proposal', methods=['GET', 'POST'])
 @login_required
 def submit_proposal(project_id):
     """Route to submit a proposal for a project"""
@@ -212,7 +215,7 @@ def submit_proposal(project_id):
         project=project
     )
 
-@app.route('/project/<project_id>/proposal/<proposal_id>/accept', methods=['POST'])
+@bp.route('/project/<project_id>/proposal/<proposal_id>/accept', methods=['POST'])
 @login_required
 def accept_proposal(project_id, proposal_id):
     """Route to accept a proposal"""
@@ -250,7 +253,7 @@ def accept_proposal(project_id, proposal_id):
     flash('Proposal accepted successfully!', 'success')
     return redirect(url_for('view_project', project_id=project_id))
 
-@app.route('/project/<project_id>/complete', methods=['POST'])
+@bp.route('/project/<project_id>/complete', methods=['POST'])
 @login_required
 def complete_project(project_id):
     """Route to mark a project as complete"""
@@ -268,7 +271,7 @@ def complete_project(project_id):
     flash('Project marked as complete!', 'success')
     return redirect(url_for('view_project', project_id=project_id))
 
-@app.route('/project/<project_id>/edit', methods=['GET', 'POST'])
+@bp.route('/project/<project_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_project(project_id):
     """Route to edit an existing project"""
@@ -326,7 +329,7 @@ def edit_project(project_id):
         is_edit=True
     )
 
-@app.route('/profile')
+@bp.route('/profile')
 @login_required
 def profile():
     """Route to view and edit user profile"""
@@ -342,7 +345,7 @@ def profile():
         profile=seller_profile
     )
 
-@app.route('/profile/edit', methods=['GET', 'POST'])
+@bp.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     """Route to edit user profile"""
@@ -417,7 +420,7 @@ def edit_profile():
         profile=seller_profile
     )
 
-@app.route('/messages')
+@bp.route('/messages')
 @login_required
 def messages():
     """Route to view all messages"""
@@ -459,8 +462,8 @@ def messages():
     
     return render_template('messages.html', conversations=conversations)
 
-@app.route('/conversation/<user_id>')
-@app.route('/conversation/<user_id>/<project_id>')
+@bp.route('/conversation/<user_id>')
+@bp.route('/conversation/<user_id>/<project_id>')
 @login_required
 def conversation(user_id, project_id=None):
     """Route to view and send messages to a specific user"""
@@ -492,7 +495,7 @@ def conversation(user_id, project_id=None):
         project=project
     )
 
-@app.route('/send_message/<user_id>', methods=['POST'])
+@bp.route('/send_message/<user_id>', methods=['POST'])
 @login_required
 def send_message(user_id):
     """Route to send a message to a user"""
@@ -518,72 +521,7 @@ def send_message(user_id):
         return redirect(url_for('conversation', user_id=user_id, project_id=project_id))
     return redirect(url_for('conversation', user_id=user_id))
 
-@app.route('/project/<project_id>/submit_proposal', methods=['GET', 'POST'])
-@login_required
-def submit_proposal(project_id):
-    """Route to submit a proposal for a project"""
-    if current_user.role != 'seller':
-        flash('Only freelancers can submit proposals', 'error')
-        return redirect(url_for('view_project', project_id=project_id))
-    
-    project = Project.query.get_or_404(project_id)
-    
-    # Check if project is still open
-    if project.status != 'open':
-        flash('This project is no longer accepting proposals', 'error')
-        return redirect(url_for('view_project', project_id=project_id))
-    
-    # Check if user has already submitted a proposal
-    existing_proposal = Proposal.query.filter_by(
-        project_id=project_id, 
-        freelancer_id=current_user.id
-    ).first()
-    
-    if existing_proposal:
-        flash('You have already submitted a proposal for this project', 'error')
-        return redirect(url_for('view_project', project_id=project_id))
-    
-    if request.method == 'POST':
-        bid_amount = request.form.get('bid_amount')
-        cover_letter = request.form.get('cover_letter')
-        estimated_completion_time = request.form.get('estimated_completion_time')
-        
-        try:
-            bid_amount = float(bid_amount)
-            estimated_completion_time = int(estimated_completion_time) if estimated_completion_time else None
-            
-            # Create new proposal
-            proposal = Proposal(
-                bid_amount=bid_amount,
-                cover_letter=cover_letter,
-                project_id=project_id,
-                freelancer_id=current_user.id,
-                estimated_completion_time=estimated_completion_time
-            )
-            
-            db.session.add(proposal)
-            
-            # Create notification for project owner
-            notification = Notification(
-                user_id=project.client_id,
-                title='New Proposal Received',
-                message=f'A new proposal has been submitted for your project "{project.title}"',
-                type='proposal'
-            )
-            db.session.add(notification)
-            
-            db.session.commit()
-            
-            flash('Proposal submitted successfully!', 'success')
-            return redirect(url_for('view_project', project_id=project_id))
-            
-        except (ValueError, TypeError):
-            flash('Invalid input values', 'error')
-            return redirect(url_for('view_project', project_id=project_id))
-    
-    return redirect(url_for('view_project', project_id=project_id))
-
-@app.route('/freelancers')
+@bp.route('/freelancers')
 @login_required
 def freelancers():
     """Route to browse available freelancers"""
@@ -606,7 +544,7 @@ def freelancers():
         freelancers=freelancers_with_profiles
     )
 
-@app.route('/freelancer/<user_id>')
+@bp.route('/freelancer/<user_id>')
 @login_required
 def view_freelancer(user_id):
     """Route to view a specific freelancer's profile"""
@@ -638,7 +576,7 @@ def view_freelancer(user_id):
         reviews=reviews
     )
 
-@app.route('/review/<project_id>/<user_id>', methods=['GET', 'POST'])
+@bp.route('/review/<project_id>/<user_id>', methods=['GET', 'POST'])
 @login_required
 def leave_review(project_id, user_id):
     """Route to leave a review for a user"""
@@ -715,7 +653,7 @@ def leave_review(project_id, user_id):
         reviewee=user
     )
 
-@app.route('/search')
+@bp.route('/search')
 @login_required
 def search():
     """Route to search for projects or freelancers"""

@@ -8,7 +8,7 @@
             <p class="mt-1 max-w-2xl text-sm text-gray-500">For: {{ freelancer.firstname }} {{ freelancer.lastname }} on project "{{ project.title }}"</p>
         </div>
         <div class="border-t border-gray-200">
-            <form method="POST" action="{{ url_for('submit_review', project_id=project.id, freelancer_id=freelancer.id) }}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
+            <form method="POST" action="{{ url_for('views.submit_review', project_id=project.id, freelancer_id=freelancer.id) }}" class="px-4 py-5 bg-white space-y-6 sm:p-6">
                 <div class="grid grid-cols-6 gap-6">
                     <div class="col-span-6">
                         <label for="rating" class="block text-sm font-medium text-gray-700">Rating</label>
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                    <a href="{{ url_for('project_details', project_id=project.id) }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                    <a href="{{ url_for('views.project_details', project_id=project.id) }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
                         Cancel
                     </a>
                     <button type="submit"

@@ -14,16 +14,16 @@
         <div class="border-t border-gray-200">
             <div class="px-4 py-5 sm:px-6">
                 <div class="flex space-x-4 mb-6">
-                    <a href="{{ url_for('search', q=query, type='projects') }}" class="px-4 py-2 rounded-md {% if search_type == 'projects' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    <a href="{{ url_for('views.search', q=query, type='projects') }}" class="px-4 py-2 rounded-md {% if search_type == 'projects' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                         Projects
                     </a>
-                    <a href="{{ url_for('search', q=query, type='freelancers') }}" class="px-4 py-2 rounded-md {% if search_type == 'freelancers' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    <a href="{{ url_for('views.search', q=query, type='freelancers') }}" class="px-4 py-2 rounded-md {% if search_type == 'freelancers' %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                         Freelancers
                     </a>
                 </div>
 
                 <!-- Search Form -->
-                <form action="{{ url_for('search') }}" method="GET" class="mb-8">
+                <form action="{{ url_for('views.search') }}" method="GET" class="mb-8">
                     <div class="flex">
                         <input type="text" name="q" value="{{ query }}" required
                             class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-l-md p-2 border"
@@ -47,7 +47,7 @@
                                 <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-200">
                                     <div class="px-4 py-5 sm:p-6">
                                         <h3 class="text-lg font-medium text-gray-900">
-                                            <a href="{{ url_for('view_project', project_id=project.id) }}" class="hover:text-indigo-600">
+                                            <a href="{{ url_for('views.view_project', project_id=project.id) }}" class="hover:text-indigo-600">
                                                 {{ project.title }}
                                             </a>
                                         </h3>
@@ -82,7 +82,7 @@
                                             </div>
                                             <div class="ml-4">
                                                 <h3 class="text-lg font-medium text-gray-900">
-                                                    <a href="{{ url_for('view_freelancer', user_id=result.user.id) }}" class="hover:text-indigo-600">
+                                                    <a href="{{ url_for('views.view_freelancer', user_id=result.user.id) }}" class="hover:text-indigo-600">
                                                         {{ result.user.firstname }} {{ result.user.lastname }}
                                                     </a>
                                                 </h3>
@@ -94,7 +94,7 @@
                                         </div>
                                         <div class="mt-4 flex justify-between items-center">
                                             <div class="text-sm font-medium text-gray-900">${{ result.profile.hourly_rate }}/hr</div>
-                                            <a href="{{ url_for('view_freelancer', user_id=result.user.id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <a href="{{ url_for('views.view_freelancer', user_id=result.user.id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                                 View Profile
                                             </a>
                                         </div>

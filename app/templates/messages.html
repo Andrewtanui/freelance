@@ -1,139 +1,95 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
-        </div>
-        
-        <div class="border-t border-gray-200">
-            <div class="flex h-[calc(100vh-200px)]">
-                <!-- Conversation List -->
-                <div class="w-1/3 border-r border-gray-200 overflow-y-auto">
-                    <div class="py-2">
-                        {% if conversations %}
-                            {% for conversation in conversations %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <!-- Messages Header -->
+            <div class="px-4 py-5 sm:px-6">
+                <h1 class="text-lg font-medium text-gray-900">Messages</h1>
+            </div>
+
+            <div class="flex h-[600px]">
+                <!-- Conversations List -->
+                <div class="w-1/3 border-r border-gray-200">
+                    <div class="overflow-y-auto h-full">
+                        {% for conversation in conversations %}
+                            <div class="border-b border-gray-200">
                                 <a href="{{ url_for('messages', conversation_id=conversation.id) }}" 
-                                   class="block px-4 py-3 hover:bg-gray-50 {% if current_conversation and current_conversation.id == conversation.id %}bg-indigo-50{% endif %}">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0">
-                                            <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                                <span class="text-lg font-medium text-white">
-                                                    {% if current_user.id == conversation.sender_id %}
-                                                        {{ conversation.recipient.firstname[0] }}{{ conversation.recipient.lastname[0] }}
-                                                    {% else %}
-                                                        {{ conversation.sender.firstname[0] }}{{ conversation.sender.lastname[0] }}
-                                                    {% endif %}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-sm font-medium text-gray-900 truncate">
-                                                {% if current_user.id == conversation.sender_id %}
-                                                    {{ conversation.recipient.firstname }} {{ conversation.recipient.lastname }}
-                                                {% else %}
-                                                    {{ conversation.sender.firstname }} {{ conversation.sender.lastname }}
-                                                {% endif %}
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate">
-                                                {% if conversation.last_message %}
-                                                    {{ conversation.last_message.content|truncate(30) }}
-                                                {% else %}
-                                                    No messages yet
-                                                {% endif %}
-                                            </p>
-                                        </div>
-                                        {% if conversation.unread_count and conversation.unread_count > 0 %}
-                                            <div class="flex-shrink-0">
-                                                <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-xs font-medium text-white">
-                                                    {{ conversation.unread_count }}
-                                                </span>
+                                   class="block px-4 py-4 hover:bg-gray-50 {% if current_conversation and current_conversation.id == conversation.id %}bg-gray-100{% endif %}">
+                                    <div class="flex items-center">
+                                        {% if conversation.other_user.profile.profile_picture %}
+                                            <img class="h-10 w-10 rounded-full" src="{{ url_for('static', filename='uploads/' + conversation.other_user.profile.profile_picture) }}" alt="Profile picture">
+                                        {% else %}
+                                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span class="text-gray-500">{{ conversation.other_user.username[0]|upper }}</span>
                                             </div>
                                         {% endif %}
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">{{ conversation.other_user.username }}</p>
+                                            {% if conversation.project %}
+                                                <p class="text-xs text-gray-500">Project: {{ conversation.project.title }}</p>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </a>
-                            {% endfor %}
-                        {% else %}
-                            <div class="px-4 py-8 text-center">
-                                <p class="text-sm text-gray-500">No conversations yet</p>
                             </div>
-                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
-                
-                <!-- Message Content -->
+
+                <!-- Messages Area -->
                 <div class="w-2/3 flex flex-col">
                     {% if current_conversation %}
                         <!-- Conversation Header -->
-                        <div class="px-4 py-3 border-b border-gray-200 flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                    <span class="text-lg font-medium text-white">
-                                        {% if current_user.id == current_conversation.sender_id %}
-                                            {{ current_conversation.recipient.firstname[0] }}{{ current_conversation.recipient.lastname[0] }}
-                                        {% else %}
-                                            {{ current_conversation.sender.firstname[0] }}{{ current_conversation.sender.lastname[0] }}
-                                        {% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">
-                                    {% if current_user.id == current_conversation.sender_id %}
-                                        {{ current_conversation.recipient.firstname }} {{ current_conversation.recipient.lastname }}
+                        <div class="px-4 py-3 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    {% if current_conversation.other_user.profile.profile_picture %}
+                                        <img class="h-8 w-8 rounded-full" src="{{ url_for('static', filename='uploads/' + current_conversation.other_user.profile.profile_picture) }}" alt="Profile picture">
                                     {% else %}
-                                        {{ current_conversation.sender.firstname }} {{ current_conversation.sender.lastname }}
+                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                            <span class="text-gray-500">{{ current_conversation.other_user.username[0]|upper }}</span>
+                                        </div>
                                     {% endif %}
-                                </p>
-                                {% if current_conversation.project %}
-                                    <p class="text-xs text-gray-500">
-                                        Project: <a href="{{ url_for('project_details', project_id=current_conversation.project.id) }}" class="text-indigo-600 hover:text-indigo-900">{{ current_conversation.project.title }}</a>
-                                    </p>
-                                {% endif %}
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">{{ current_conversation.other_user.username }}</p>
+                                        {% if current_conversation.project %}
+                                            <p class="text-xs text-gray-500">
+                                                Project: <a href="{{ url_for('project_details', project_id=current_conversation.project.id) }}" class="text-indigo-600 hover:text-indigo-900">{{ current_conversation.project.title }}</a>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <!-- Messages -->
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="message-container">
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="flex {% if message.sender_id == current_user.id %}justify-end{% endif %}">
-                                        <div class="{% if message.sender_id == current_user.id %}bg-indigo-100 text-gray-900{% else %}bg-gray-100 text-gray-900{% endif %} rounded-lg px-4 py-2 max-w-xs sm:max-w-md">
-                                            <p class="text-sm">{{ message.content }}</p>
-                                            <p class="text-xs text-gray-500 text-right mt-1">{{ message.created_at.strftime('%H:%M | %b %d') }}</p>
-                                        </div>
+
+                        <!-- Messages List -->
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                            {% for message in messages %}
+                                <div class="flex {% if message.sender_id == current_user.id %}justify-end{% endif %}">
+                                    <div class="max-w-[70%] rounded-lg px-4 py-2 {% if message.sender_id == current_user.id %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-900{% endif %}">
+                                        <p class="text-sm">{{ message.content }}</p>
+                                        <p class="text-xs mt-1 {% if message.sender_id == current_user.id %}text-indigo-100{% else %}text-gray-500{% endif %}">
+                                            {{ message.created_at.strftime('%I:%M %p') }}
+                                        </p>
                                     </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="flex items-center justify-center h-full">
-                                    <p class="text-sm text-gray-500">No messages yet. Start the conversation!</p>
                                 </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
-                        
+
                         <!-- Message Input -->
-                        <div class="border-t border-gray-200 px-4 py-3">
+                        <div class="border-t border-gray-200 p-4">
                             <form method="POST" action="{{ url_for('send_message', conversation_id=current_conversation.id) }}" class="flex space-x-3">
-                                <div class="flex-1">
-                                    <input type="text" name="content" placeholder="Type your message..." required
-                                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
-                                </div>
-                                <button type="submit"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <input type="text" name="content" class="flex-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Type your message...">
+                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Send
                                 </button>
                             </form>
                         </div>
                     {% else %}
-                        <div class="flex items-center justify-center h-full">
-                            <div class="text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">No conversation selected</h3>
-                                <p class="mt-1 text-sm text-gray-500">Select a conversation from the list or start a new one.</p>
-                            </div>
+                        <div class="flex-1 flex items-center justify-center">
+                            <p class="text-gray-500">Select a conversation to start messaging</p>
                         </div>
                     {% endif %}
                 </div>
@@ -141,14 +97,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Scroll to bottom of message container on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const messageContainer = document.getElementById('message-container');
-        if (messageContainer) {
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-    });
-</script>
-{% endblock body %}
+{% endblock %}

@@ -16,7 +16,7 @@
               <h3 class="text-base font-semibold text-gray-900">{{ project.title }}</h3>
               <span class="block text-xs font-normal text-gray-500">{{ project.category }}</span>
             </div>
-            <a href="{{ url_for('view_project', project_id=project.id) }}" class="text-sm font-medium text-indigo-500">View Project</a>
+            <a href="{{ url_for('views.view_project', project_id=project.id) }}" class="text-sm font-medium text-indigo-500">View Project</a>
           </div>
           <p class="my-6 text-sm font-normal text-gray-500">{{ project.description|truncate(200) }}</p>
           <div class="mt-6 flex items-center justify-between text-sm font-semibold text-gray-900">
@@ -44,6 +44,11 @@
       <div class="px-4">
         <div class="my-5">
           <h2 class="text-lg font-semibold text-gray-900">No projects available</h2>
+          {% if current_user.role == 'customer' %}
+          <p class="mt-2">
+            <a href="{{ url_for('views.new_project') }}" class="text-indigo-600 hover:text-indigo-900">Post your first project</a>
+          </p>
+          {% endif %}
         </div>
       </div>
       {% endif %}

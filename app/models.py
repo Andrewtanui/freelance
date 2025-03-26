@@ -1,33 +1,21 @@
-from app import db
-from flask_login import UserMixin
-import uuid
 from datetime import datetime
-
-from app import app
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 import uuid
-from datetime import datetime
-
-# Set up the application context
-app.app_context().push()
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-
-db = SQLAlchemy(app)
+from flask_login import UserMixin
+from . import db
 
 class Users(UserMixin, db.Model):
     """User model for storing user data"""
     __tablename__ = 'users'
     id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     role = db.Column(db.String(20), nullable=False)  # customer or seller
     phonenumber = db.Column(db.String(20), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now())
     
     # Relationships
     seller_profile = db.relationship('Seller', backref='user', lazy=True)
@@ -38,15 +26,17 @@ class Users(UserMixin, db.Model):
     messages_sent = db.relationship('Message', backref='sender', lazy=True, foreign_keys='Message.sender_id')
     messages_received = db.relationship('Message', backref='receiver', lazy=True, foreign_keys='Message.receiver_id')
     proposals = db.relationship('Proposal', backref='freelancer', lazy=True)
+    notifications = db.relationship('Notification', backref='user', lazy=True)
     
-    def __init__(self, firstname, lastname, password, email, role, phonenumber):
+    def __init__(self, firstname, lastname, username, password, email, role, phonenumber=None):
         self.firstname = firstname
         self.lastname = lastname
+        self.username = username
         self.password = password
         self.email = email
         self.role = role
         self.phonenumber = phonenumber
-        self.created_at = datetime.utcnow()
+        self.created_at = datetime.now()
 
     def get_full_name(self):
         """Method to fetch the full name"""
@@ -179,3 +169,26 @@ class Message(db.Model):
         self.receiver_id = receiver_id
         self.project_id = project_id
 
+
+class Notification(db.Model):
+    """Notification model for storing user notifications"""
+    __tablename__ = 'notifications'
+    
+    id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # e.g., 'project_award', 'new_proposal', 'message'
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    related_id = db.Column(db.String(36), nullable=True)  # Can store project_id, proposal_id, etc.
+    
+    def __init__(self, user_id, title, message, type, related_id=None):
+        self.user_id = user_id
+        self.title = title
+        self.message = message
+        self.type = type
+        self.related_id = related_id
+
+    def __repr__(self):
+        return f'<Notification {self.id}: {self.title}>'

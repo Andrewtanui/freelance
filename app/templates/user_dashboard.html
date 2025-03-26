@@ -83,7 +83,7 @@
               {% endif %}
             </h3>
             {% if not current_user.is_freelancer %}
-              <a href="{{ url_for('new_project') }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <a href="{{ url_for('views.new_project') }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="-ml-0.5 mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
@@ -125,7 +125,7 @@
                         {% if project.deadline %}{{ project.deadline.strftime('%b %d, %Y') }}{% else %}No deadline{% endif %}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                        <a href="{{ url_for('views.project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -150,7 +150,7 @@
                         {% if project.deadline %}{{ project.deadline.strftime('%b %d, %Y') }}{% else %}No deadline{% endif %}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                        <a href="{{ url_for('views.project_details', project_id=project.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -207,7 +207,7 @@
         <div class="bg-white shadow rounded-lg overflow-hidden">
           <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">Profile</h3>
-            <a href="{{ url_for('edit_profile') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Edit</a>
+            <a href="{{ url_for('views.edit_profile') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Edit</a>
           </div>
           <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
             <div class="flex items-center">
@@ -240,14 +240,14 @@
         <div class="bg-white shadow rounded-lg overflow-hidden">
           <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">Recent Messages</h3>
-            <a href="{{ url_for('messages') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
+            <a href="{{ url_for('views.messages') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">View all</a>
           </div>
           <div class="border-t border-gray-200">
             <ul class="divide-y divide-gray-200">
               {% if recent_messages %}
                 {% for message in recent_messages %}
                   <li>
-                    <a href="{{ url_for('messages', conversation_id=message.conversation_id) }}" class="block hover:bg-gray-50">
+                    <a href="{{ url_for('views.messages', conversation_id=message.conversation_id) }}" class="block hover:bg-gray-50">
                       <div class="px-4 py-4 sm:px-6">
                         <div class="flex items-center justify-between">
                           <p class="text-sm font-medium text-indigo-600 truncate">
